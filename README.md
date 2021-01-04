@@ -17,4 +17,5 @@
 7. [维吉尼亚密码及其破译 Vigenère Cipher and Breaking](https://github.com/ethanliuzhuo/Cryptography/blob/main/%E5%86%85%E5%AE%B9/7%E7%BB%B4%E5%90%89%E5%B0%BC%E4%BA%9A%E5%AF%86%E7%A0%81%E5%8F%8A%E5%85%B6%E7%A0%B4%E8%AF%91.pdf)
 8. [破解矩阵换位 Breaking Rectangular Transposition](https://github.com/ethanliuzhuo/Cryptography/blob/main/%E5%86%85%E5%AE%B9/8%E7%A0%B4%E8%AF%91%E7%9F%A9%E9%98%B5%E6%8D%A2%E4%BD%8D.pdf)
 9. [熵的性质 Properties of the Entropy]()
+
 持续更新
