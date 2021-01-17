@@ -1,0 +1,540 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{希尔密码}
+
+
+\author{
+Hill Cipher\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+\begin{document}
+\maketitle
+
+\section{矩阵的模运算}
+矩阵的模运算(Modulo arithmetic on matrices)。令$A, B$ 是 $m \times n$ 的矩阵，矩阵元素都为整数。如果
+$$
+a_{i, j} \equiv b_{i, j} \quad \bmod m
+$$
+
+对于全部的 $a_{i, j}, b_{i, j}$. 则$A$ and $B$ 是模m的同余.记作$A \equiv B \bmod m$.
+
+如果存在$A,B $是$ n \times n$矩阵，其元素都为整数，使得
+$$AB = I \bmod m \mbox{和} BA = I \bmod m,$$那么$A^{-1} = B \bmod m$, B是A模m的逆。
+
+
+\textbf{例1}
+
+令$m = 5,$ $A=\left[\begin{array}{ll}2 & 3 \\ 2 & 1\end{array}\right]$ 和 $B=\left[\begin{array}{ll}1 & 2 \\ 3 & 2\end{array}\right] .$
+
+\begin{eqnarray}   
+\label{eq}
+A+2 B \bmod 5&=& \left[\begin{array}{ll}
+2 & 3 \\
+2 & 1
+\end{array}\right]+\left[\begin{array}{ll}
+2 & 4 \\
+{\color{red}6} & 4
+\end{array}\right] \pmod{5} \nonumber \\ 
+&=& \left[\begin{array}{ll}
+2 & 3 \\
+2 & 1
+\end{array}\right]+\left[\begin{array}{ll}
+2 & 4 \\
+{\color{red}1} & 4
+\end{array}\right] \pmod{5} \nonumber \\ 
+&=& \left[\begin{array}{ll}
+4 & 7 \\
+3 & 5
+\end{array}\right]  \pmod{5}  \nonumber \\ 
+&=& \left[\begin{array}{ll}
+4 & 2 \\
+3 & 0
+\end{array}\right]  \pmod{5}  \nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+
+\begin{eqnarray}   
+\label{eq}
+BA \bmod 5&=& \left[\begin{array}{ll}
+1 & 2 \\
+3 & 2
+\end{array}\right]\left[\begin{array}{ll}
+2 & 3 \\
+2 & 1
+\end{array}\right] \pmod{5} \nonumber \\ 
+&=& \left[\begin{array}{ll}
+6 & 5 \\
+10 & 11
+\end{array}\right] \pmod{5} \nonumber \\ 
+&=& \left[\begin{array}{ll}
+1 & 0 \\
+0 & 1
+\end{array}\right]  \pmod{5} \nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+\clearpage
+
+\section{矩阵行列式的模}
+矩阵行列式(determinant)。
+
+$$det(A) \bmod m$$
+
+\textbf{例2}
+
+$$
+A=\left[\begin{array}{cc}
+3 & 4 \\
+-9 & 8
+\end{array}\right]  \bmod 10
+$$
+
+$$
+\begin{aligned}
+\operatorname{det}(A)=a d-b c=(3)(8)-(-9)(4) &=60 \\
+=& 0 \bmod 10
+\end{aligned}
+$$
+
+\section{希尔密码}
+希尔密码（Hill cipher）是一种分组密码，将成对的明文
+字母通过转换加密：
+$$Y=AX \bmod 26$$其中A是一个$2 \times 2$的可逆矩阵(invertible matrix)并且mod 26.
+
+模26的逆：
+
+$$
+\begin{array}{cc}
+ {1^{-1} \equiv 1(\bmod 26)} & 3^{-1} \equiv 9(\bmod 26) \\
+ 9^{-1} \equiv 3(\bmod 26) & 5^{-1} \equiv 21(\bmod 26) \\ 
+ 21^{-1} \equiv 5(\bmod 26) & 7^{-1} \equiv 15(\bmod 26) \\ 
+ 15^{-1} \equiv 7(\bmod 26) & 11^{-1} \equiv 19(\bmod 26) \\
+ 19^{-1} \equiv 11(\bmod 26) & 17^{-1} \equiv 23(\bmod 26)\\
+ 23^{-1} \equiv 17(\bmod 26) & 25^{-1} \equiv 25(\bmod 26)\\
+\end{array}
+$$
+
+~\\
+
+\textbf{例3}
+
+令$A=\left[\begin{array}{cc}
+22 & 13 \\
+11 & 5
+\end{array}\right]$，使用希尔密码加密明文“$MISSING$”.
+
+解：
+
+\setlength{\tabcolsep}{1mm}{
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}% 通过添加 | 来表示是否需要绘制竖线
+\hline  % 在表格最上方绘制横线
+0&1&2&3&4&5&6&7&8&9&10&11&12&13&14&15&16&17&18&19&20&21&22&23&24&25\\
+\hline  %在第一行和第二行之间绘制横线
+A&B&C&D&E&F&G&H&I&J&K&L&M&N&O&P&Q&R&S&T&U&V&W&X&Y&Z\\
+\hline % 在表格最下方绘制横、
+\end{tabular}
+}
+
+$$
+\begin{array}{l}
+{\left[\begin{array}{l}
+M \\
+I
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+12 \\
+8
+\end{array}\right] \rightarrow AX \bmod 26 \rightarrow \left[\begin{array}{cc}
+22 & 13 \\
+11 & 5
+\end{array}\right]\left[\begin{array}{l}
+12 \\
+8
+\end{array}\right]} \bmod 26  \rightarrow \left[\begin{array}{l}
+368 \\
+172
+\end{array}\right] \bmod 26 \rightarrow \left[\begin{array}{l}
+4 \\
+16
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+E \\
+Q
+\end{array}\right]\\
+{\left[\begin{array}{l}
+S \\
+S
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+18 \\
+18
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+6 \\
+2
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+\mathrm{G} \\
+\mathrm{C}
+\end{array}\right]} \\
+{\left[\begin{array}{l}
+I \\
+N
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+8 \\
+13
+\end{array}\right] \rightarrow \left[\begin{array}{l}
+7 \\
+23
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+H \\
+X
+\end{array}\right]} \\
+{\left[\begin{array}{l}
+G \\
+{\color{red}K}
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+6 \\
+{\color{red}10}
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+2 \\
+{\color{red}12}
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+C \\
+{\color{red}M}
+\end{array}\right]}
+\end{array}
+$$
+
+遇到明文长度为奇数时，可以规定某个字母为填充项。这里使用字母${\color{red}K}$作为填充项。
+
+最后密文为：$EQGCHXCM$ \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad   \Box
+
+~\\
+
+希尔密码解密为：$X = A^{-1}Y \bmod 26$
+
+\textbf{例4}
+
+解密"$ZGWQ$",令$A=\left[\begin{array}{cc}
+3 & 7 \\
+9 & 10
+\end{array}\right]$
+
+解：
+
+\begin{eqnarray}   
+\label{eq}
+A^{-1}&=&\frac{1}{det(A)}\left[\begin{array}{cc}
+d & -b \\
+-c & a
+\end{array}\right] \bmod 26 \nonumber \\ 
+&=& \operatorname{det}(A)^{-1} \cdot\left[\begin{array}{cc}
+10 & -7 \\
+-9 & 3
+\end{array}\right] \bmod 26 \nonumber \\ 
+&=&\operatorname{det(A)}^{-1}\left[\begin{array}{cc}
+10 & 19 \\
+17 & 3
+\end{array}\right]  \bmod 26 \nonumber \\ 
+&=& (-33\bmod 26)^{-1} \times \left[\begin{array}{cc}
+10 & 19 \\
+17 & 3
+\end{array}\right]  \bmod 26 \nonumber \\ 
+&=& 19^{-1} \times \left[\begin{array}{cc}
+10 & 19 \\
+17 & 3
+\end{array}\right]  \bmod 26 \nonumber \\ 
+&=& 11 \times \left[\begin{array}{cc}
+10 & 19 \\
+17 & 3
+\end{array}\right]  \bmod 26 \nonumber \\ 
+&=&\left[\begin{array}{cc}
+6 & 1 \\
+5 & 7
+\end{array}\right]  \bmod 26 \nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+$$
+\begin{array}{l}
+{\left[\begin{array}{l}
+Z \\
+G
+\end{array}\right] \rightarrow\left[\begin{array}{c}
+25 \\
+6
+\end{array}\right] \rightarrow\left[\begin{array}{ll}
+6 & 1 \\
+5 & 7
+\end{array}\right]\left[\begin{array}{c}
+25 \\
+6
+\end{array}\right] \bmod 26=\left[\begin{array}{l}
+0 \\
+11
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+A \\
+L
+\end{array}\right]} \\
+\left[\begin{array}{l}
+W \\
+Q
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+22 \\
+16
+\end{array}\right] \rightarrow\left[\begin{array}{ll}
+6&1 \\
+5&7
+\end{array}\right]\left[\begin{array}{l}
+22 \\
+16
+\end{array}\right] \bmod 26 =\left[\begin{array}{l}
+18 \\
+14
+\end{array}\right] \rightarrow\left[\begin{array}{l}
+S \\
+O
+\end{array}\right]
+\end{array}
+$$
+
+解密字符为："ALSO"
+
+\clearpage
+
+\textbf{例5}
+
+加密CODE，令$A=\left[\begin{array}{cc}
+22 & 13 \\
+11 & 5
+\end{array}\right]$
+\begin{lstlisting}
+import numpy as np
+
+Plaintext = 'COKE'#字母需要大写
+
+A  = np.mat([[22,13],[11,5]])
+
+Ciphertext = ''
+
+if len(Plaintext)%2 == 0:
+    pass
+else:
+    Plaintext += 'K' #填充K
+
+for i in range(len(Plaintext)):
+    if i%2 == 0:
+        M = Plaintext[i:i+2]
+        
+        X = np.mat([[ord(M[0]) -65],[ord(M[1]) -65]]) 
+        Y = A*X%26
+        
+        Ciphertext += chr(int(Y[0]) + 65)
+        Ciphertext += chr(int(Y[1]) + 65)
+print(Ciphertext)    
+\end{lstlisting}
+
+输出：SOMA
+
+\clearpage
+
+\textbf{例6}
+
+已知密文"$DLHIVDLZHIPNEU$",已知使用希尔密码和$2 \times 2$作为加密手段。并且有明显证据证明明文开头为$DEAR$。尝试解密。
+
+解：
+
+\setlength{\tabcolsep}{2mm}{
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}% 通过添加 | 来表示是否需要绘制竖线
+\hline  % 在表格最上方绘制横线
+{\color{red}D}&{\color{red}L}&{\color{red}H}&{\color{red}I}&V&D&L&Z&H&I&P&N&E&U \\\hline  %在第一行和第二行之间绘制横线
+3&11&7&8&21&3&11&25&7&8&15&13&4&20 \\\hline % 在表格最下方绘制横、
+\end{tabular}
+}
+
+\setlength{\tabcolsep}{2mm}{
+\begin{tabular}{|c|c|c|c|}% 通过添加 | 来表示是否需要绘制竖线
+\hline  % 在表格最上方绘制横线
+{\color{blue}D}&{\color{blue}E}&{\color{blue}A}&{\color{blue}R} \\\hline  %在第一行和第二行之间绘制横线
+3&4&0&17 \\\hline % 在表格最下方绘制横、
+\end{tabular}
+}
+
+
+$$
+\left[\begin{array}{l}
+D \\
+L
+\end{array}\right] \mapsto\left[\begin{array}{l}
+D \\
+E
+\end{array}\right]
+$$
+
+$$
+\left[\begin{array}{l}
+H \\
+I
+\end{array}\right] \mapsto\left[\begin{array}{l}
+V \\
+D
+\end{array}\right]
+$$
+
+下一步计算$A^{-1}$,
+
+$$
+\begin{array}{l}
+A^{-1}\left[\begin{array}{l}
+3 \\
+11
+\end{array}\right]=\left[\begin{array}{l}
+3 \\
+4
+\end{array}\right] \bmod 26 \\
+A^{-1}\left[\begin{array}{l}
+7 \\
+8
+\end{array}\right]=\left[\begin{array}{l}
+0 \\
+17
+\end{array}\right] \bmod 26
+\end{array}
+$$
+
+因为：
+$$
+\begin{aligned}
+A^{-1}\left[\begin{array}{ll}
+3 & 7 \\
+11 & 8
+\end{array}\right] = \left[\begin{array}{ll}
+3 & 0 \\
+4 & 17
+\end{array}\right]
+
+所以：
+$$
+\begin{aligned}
+A^{-1} &{=\left[\begin{array}{ll}
+3 & 0 \\
+4 & 17
+\end{array}\right] \cdot\left[\begin{array}{ll}
+3 & 7 \\
+11 & 8
+\end{array}\right]^{-1}} = {\left[\begin{array}{ll}
+3 & 0 \\
+4 & 17
+\end{array}\right] \cdot\left[\begin{array}{ll}
+18 & 7 \\
+11 & 23
+\end{array}\right]=\left[\begin{array}{ll}
+2 & 21 \\
+25 & 3
+\end{array}\right] \bmod 26}
+\end{aligned}
+$$
+
+$X = A^{-1} \cdot Y$,与例4同理
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+

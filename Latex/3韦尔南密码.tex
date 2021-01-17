@@ -1,0 +1,286 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{韦尔南密码}
+
+
+\author{
+Vernam Cipher\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+\begin{document}
+\maketitle
+
+\section{余商定理}
+\textit{余商定理(Quotient-Remainder Theorem)。 给定一个整数$A$和一个正整数$B$。存在整数$q,r$，使得$
+A=B \cdot q+r$ 其中$0 \leq r \leq B$。}
+
+\textit{如果$a \bmod m = b \bmod m = r$ ，则a和b是模全等(Congruent Modulo)，记做$a \equiv b \bmod m$。如$8 \equiv -8 \bmod 16$}
+
+
+
+\textbf{例1}
+
+$$ \underbrace{521}_{A}=  \underbrace{26}_{B} \times  \underbrace{20}_{(\mbox{商}q)} +\underbrace{1}_{(\mbox{余}r)}
+$$
+
+$$521 = 1 \bmod 26$$ 
+
+
+\textbf{例2}
+
+\begin{eqnarray}   
+\label{eq}
+\underbrace{-521}_{A}&=& -26 \times 20 -1 \nonumber \\ 
+&=& 26 \times (-20) +  (-1)  \nonumber \\ 
+&=& 26 \times (-20) + 26 + (-1) -26 \nonumber \\ 
+&=& \underbrace{26}_{B} \times \underbrace{-21}_{q} + \underbrace{25}_{r}\nonumber \\
+\nonumber 
+\end{eqnarray}
+
+$$-521 = 25 \bmod 26$$ 
+
+\textbf{例3}
+
+\begin{eqnarray}   
+\label{eq}
+785  &=& 521 + 264 \pmod{26} \nonumber \\ 
+&=& 1 +4 \pmod{26} \nonumber \\ 
+&=& 5 \pmod{26}
+\nonumber 
+\end{eqnarray} 
+
+\clearpage
+
+
+\textbf{例4}
+
+\begin{eqnarray}   
+\label{eq}
+139 \times 787 \pmod{26} &=& (26 \times 5 + 9) \times   (26 \times 30 + 7) \pmod{26} \nonumber \\ 
+&=& 9 \times 7 \pmod{26} \nonumber \\ 
+&=& 63\pmod{26} \nonumber \\ 
+&=& 11 \pmod{26}
+\nonumber 
+\end{eqnarray}
+
+
+\section{加密过程}
+\begin{enumerate}
+\item 转化明文，从0开始，按字母表顺序给每个字母分别编号；
+
+\setlength{\tabcolsep}{1mm}{
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}% 通过添加 | 来表示是否需要绘制竖线
+\hline  % 在表格最上方绘制横线
+0&1&2&3&4&5&6&7&8&9&10&11&12&13&14&15&16&17&18&19&20&21&22&23&24&25\\
+\hline  %在第一行和第二行之间绘制横线
+A&B&C&D&E&F&G&H&I&J&K&L&M&N&O&P&Q&R&S&T&U&V&W&X&Y&Z\\
+\hline % 在表格最下方绘制横、
+\end{tabular}
+}
+
+\item 选取两组短密钥U 和 V，然后计算长密钥K：
+
+$$K(i) = U(i) + v(i) \bmod 26$$
+
+其中$1 \leq i \leq n$, $n$为明文长度
+
+\item 计算密文$C$:
+
+$$
+C(i):=M(i)+K(i) \bmod 26
+$$
+
+然后使用对应的字母替代明文字母；
+
+\end{enumerate}
+
+\textbf{例5}
+
+设密钥${U,V} = {(3,1,2),(7,3,8,4,5)}$,加密明文$NO\ MORE\ AMMO$
+
+解：
+$$
+\begin{array}{|l||c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline \mbox{U} & {\color{red}3}  &{\color{red}1} & {\color{red}2}&3 & 1&2 & 3&1 & 2& 3&1 &2& 3&1 &2 \\
+\hline \mbox{V} & {\color{blue}7} & {\color{blue}3} &{\color{blue}8} & {\color{blue}4} & {\color{blue}5} & 7&3 &8 &4 &5 & 7&3 &8 & 4&5 \\
+\hline K = U+V \bmod 26 &10 &4 &10 &7 &6 &9 &6 &9 &6 &8 &8 &5 &11 &5 &7 \\
+\hline
+\end{array}\\
+$$
+
+$$
+\begin{array}{|c||c|c|c|c|c|c|c|c|c|c|}
+\hline \text { \mbox{明文} } & \mathrm{N} & 0 & \mathrm{M} & 0 &\mathrm{R} & \mathrm{E} & \mathrm{A} & \mathrm{M} & \mathrm{M} & \mathrm{O}  \\
+\hline M & 13 & 14 & 12 & 14 & 17 & 4 & 0 & 12 & 12 & 14 \\
+\hline K & 10 & 4 & 10 & 7 & 6 & 9 & 6 & 9 & 6 & 8 \\
+\hline C= M + K \bmod 26 & 23 & 18 & 22 & 21 & 23 &13 &6 & 21&18 & 22\\
+\hline \text { \mbox{密文} } & X & S & \mathrm{W} & V & X & N&G &V & S&W \\
+\hline
+\end{array}
+$$
+
+\clearpage
+
+\textbf{例6}
+
+
+\begin{lstlisting}
+Plaintext = 'MYNAMEISBOB'#字母需要大写
+U = [3,1,2,5,5,7,7,5,7]
+V = [5,4,2,3,5,6,4,23,99,12]
+
+def lcm(x, y):
+   #  最小公倍数
+   if x > y:
+       greater = x
+   else:
+       greater = y
+ 
+   while(True):
+       if((greater % x == 0) and (greater % y == 0)):
+           lcm = greater
+           break
+       greater += 1
+ 
+   return lcm
+
+K_len = lcm(len(U),len(V))
+K = [0 for i in range(K_len)]
+
+for i in range(K_len):
+    K[i] = (U[i%len(U)] +  V[i%len(V)])%26
+
+#print(K)#密钥
+
+Ciphertext = ''
+for i in range(len(Plaintext)):
+    M_i = ord(Plaintext[i]) -65 #大写字母 -65 ASCII表
+    K_i = K[i%len(K)]
+    C_i = (M_i+K_i)%26
+    Ciphertext += chr(C_i+ 65) 
+    
+print(Ciphertext)
+\end{lstlisting}
+
+输出：UDRIWRTUDDH
+
+
+
+\clearpage
+\textbf{例7}
+
+解密例6的加密字符$UDRIWRTUDDH$
+
+\begin{lstlisting}
+Ciphertext = 'UDRIWRTUDDH'   #已知
+U = [3,1,2,5,5,7,7,5,7]     #已知
+V = [5,4,2,3,5,6,4,23,99,12]    #已知
+
+K_len = lcm(len(U),len(V))
+K = [0 for i in range(K_len)]
+
+for i in range(K_len):
+    K[i] = (U[i%len(U)] +  V[i%len(V)])%26
+
+print(K)#密钥
+
+Plaintext = ''
+for i in range(len(Ciphertext)):
+    C_i = ord(Ciphertext[i]) -65 #大写字母 -65 ASCII表
+    K_i = K[i%len(K)]
+    M_i = (C_i - K_i)%26
+
+    Plaintext += chr(M_i+ 65) 
+print(Plaintext)
+\end{lstlisting}
+
+输出：MYNAMEISBOB
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+

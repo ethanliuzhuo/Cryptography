@@ -1,0 +1,298 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{凯撒密码}
+
+
+\author{
+The Caesar Cipher\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+\begin{document}
+\maketitle
+
+凯撒密码，或称凯撒加密、凯撒变换、变换加密，是一种最简单且最广为人知的加密技术。距今已有2000余年的历史。
+
+凯撒密码属于密码学中的替换加密，即密文是由明文中的所有字母在字母表上向后（或向前）按照一个固定数目进行偏移而生成。
+
+%\begin{figure}[H] %H为当前位置，!htb为忽略美学标准，htbp为浮动图形
+%\centering %图片居中
+%\includegraphics[width=0.7\textwidth]{图库/1.1.jpg} %插入图片，[]中设置图片大小，{}中是图片文件名
+%\caption{Main name 2} %最终文档中希望显示的图片标题
+%\label{Fig.main2} %用于文内引用的标签
+%\end{figure}
+
+\section{加密}
+
+首先需要设置偏移量：
+
+\textbf{例1}
+
+当偏移量为16时，得到如下加密方法。所有的字母\textbf{A}向拉丁字母表右移动16位，将被替换成字母\textbf{Q}，字母\textbf{B}向字母表右移动16位变成字母\textbf{R}，以此列推。
+
+$$
+\begin{array}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+\hline \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D} & \mathrm{E} & \mathrm{F} & \mathrm{G} & \mathrm{H} & \mathrm{I} & \mathrm{J} & \mathrm{K} & \mathrm{L} & \mathrm{M} & \mathrm{N} \\
+\hline \mathrm{Q} & \mathrm{R} & \mathrm{S} & \mathrm{T} & \mathrm{U} & \mathrm{V} & \mathrm{W} & \mathrm{X} & \mathrm{Y} & \mathrm{Z} & \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D} \\
+\hline
+\end{array}\\
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline \mathrm{O} & \mathrm{P} & \mathrm{Q} & \mathrm{R} & \mathrm{S} & \mathrm{T} & \mathrm{U} & \mathrm{V} & \mathrm{W} & \mathrm{X} & \mathrm{Y} & \mathrm{Z} \\
+\hline \mathrm{E} & \mathrm{F} & \mathrm{G} & \mathrm{H} & \mathrm{I} & \mathrm{J} & \mathrm{K} & \mathrm{L} & \mathrm{M} & \mathrm{N} & \mathrm{O} & \mathrm{P} \\
+\hline
+\end{array}
+$$
+
+如明文：Person。加密后可以得到：FUHIED。\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box
+
+~\\
+
+由此我们可以知道，密钥空间$|K| = $密钥数量$ = 26$。
+
+或者$|K| = 25$，当偏移量为26时，字母A替换成字母A这种情况不算。
+
+~\\
+
+\textbf{例2}
+
+使用$Python$程序加密I am a person.
+
+\begin{lstlisting}
+Plaintext = 'iamaperson'
+ciphertext = ''
+
+key = 4 %偏移量
+
+for i in Plaintext:
+    if (ord(i) + key) > 122:
+            alpha =  chr((ord(i)  + key)  - 26)
+    else:
+        alpha = chr(ord(i) + key)
+    ciphertext += alpha
+print(ciphertext)
+\end{lstlisting}
+
+输出：meqetivwsr \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box
+
+ 
+
+作为明文时一般没有空格，大小写也不区分。
+
+
+\section{解密}
+由于\textbf{拉丁字母表}中的字母有且仅有26个，使得凯撒密码易受频率分析和暴力破解的攻击。
+最多26种可能性即可破解。
+
+\textbf{例3}
+
+破解密文：exxegoexsrgi
+
+~\\
+
+使用$Python$程序破解：
+\begin{lstlisting}
+cipher = 'exxegoexsrgi'
+
+for j in range(26):
+    Plaintext = ''
+    for i in cipher:
+        if (ord(i) - j) < 97:
+            alpha =  chr((ord(i) - j)  + 26)
+        else:
+            alpha = chr(ord(i) - j)
+        Plaintext += alpha
+    print(Plaintext)
+\end{lstlisting}
+
+输出：
+$$
+\begin{array}{|c|c|}
+\hline \text {Shift} & \text {Output} \\
+\hline A & \text {\color{red} exxegoexsrgi} \\
+\hline B & \text {dwwdfndwrqfh} \\
+\hline C & \text {cvvcemcvqpeg} \\
+\hline D & \text {buubdlbupodf} \\
+\hline E & \text {\color{blue} attackatonce} \\
+\hline F & \text {zsszbjzsnmbd} \\
+\hline \ldots & \ldots \\
+\hline X & \text {haahjrhavujl} \\
+\hline Y & \text {gzzgiqgzutik} \\
+\hline Z & \text {fyyfhpfytshj} \\
+\hline
+\end{array}
+$$
+
+由此可知，解密后明文为attack at once\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box
+
+\section{凯撒密码的改进}
+是否觉得凯撒密码太过于简单被破解？我们有三种方法可以使得密文更难破解：
+\begin{itemize}
+\end{itemize}
+\begin{itemize}
+\item 随机替换(Randomize the Order of Substitution)
+\item 特殊符号替代(Homophonic Substitution)
+\item 多字母替代(Poly-alphabetic Substitution)
+\end{itemize}
+
+\subsection{随机替换}
+即不按照字母表顺序进行替换，而是随机移位，使得每个字母一一对应。如：
+$$
+\begin{array}{|l|l|l|l|l|l|l|l|l|l|l|}
+\hline \mathrm{a} & \mathrm{b} & \mathrm{c} & \mathrm{d} & \mathrm{e} & \mathrm{f} & \mathrm{g} & \mathrm{h} & \mathrm{i} & \mathrm{j} & \ldots \\
+\hline \mathrm{c} & \mathrm{t} & \mathrm{h} & \mathrm{a} & \mathrm{q} & \mathrm{z} & \mathrm{x} & \mathrm{v} & \mathrm{n} & \mathrm{p} & \ldots \\
+\hline
+\end{array}
+$$	
+
+计算密钥空间。我们知道‘A’的偏移选择一共有26种（包括自己），‘B’的偏移选择一共有25种，以此列推。密钥空间一共就有$26！$种，介于$2^{88}$和$2^{89}$之间。相比起传统的凯撒密码，破解难度大大提升。
+
+然而，该方法还是易受频率分析的影响而被破解。明文和密文仍然存在遵循字母的频率分布。即统计一串字符每个字母出现次数除以总字符数（仅字母）。
+\begin{figure}[H] %H为当前位置，!htb为忽略美学标准，htbp为浮动图形
+\centering %图片居中
+\includegraphics[width=0.7\textwidth]{图库/1.2.png} %插入图片，[]中设置图片大小，{}中是图片文件名
+\caption{英语语言材料中的字母频率} %最终文档中希望显示的图片标题
+\label{Fig.main2} %用于文内引用的标签
+\end{figure}
+
+明文足够情况下，通过对密文的出现字母频率分析，依然可以推理出明文。
+
+\clearpage
+
+\subsection{特殊符号替代}
+
+字母可以使用特殊符号替代，标点符号，数字，数学符号，希腊字母表，甚至是emoji表情都可以。并且每个字母可以分配多个密文符号。
+
+\begin{figure}[H] %H为当前位置，!htb为忽略美学标准，htbp为浮动图形
+\centering %图片居中
+\includegraphics[width=0.7\textwidth]{图库/1.3.png} %插入图片，[]中设置图片大小，{}中是图片文件名
+\caption{特殊符号替代} %最终文档中希望显示的图片标题
+\label{Fig.main2} %用于文内引用的标签
+\end{figure}
+
+\textbf{例4}
+
+密文$\Diamond\Box \Box \Delta $既可以是$FOOD$也可以是 $AMMO$。 $\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box$
+
+~\\
+
+\textbf{例5}
+
+明文$OK$既可以是 "$83$" 也可以是 "$[3$"。 $\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box$
+~\\
+
+相比随机替换，不容易被频率分析破解。
+~\\
+
+\clearpage
+
+\subsection{多字母替代}
+1467年， 莱昂·巴蒂斯塔·阿尔贝蒂（Leon Battista Alberti）发明了密码盘。允许发送者对明文的不同部分使用不同的字母。16世纪，有人根据给定的密钥使用多个凯撒密码对明文进行加密
+。
+
+~\\
+
+\textbf{例6}
+
+$$
+\begin{aligned}
+&\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D} & \mathrm{E} & \mathrm{F} & \mathrm{G} & \mathrm{H} & \mathrm{I} & \mathrm{J} & \mathrm{K} & \mathrm{L} & \mathrm{M} & \mathrm{N} \\
+\hline \mathrm{\color{red}R} & \mathrm{S} & \mathrm{T} & \mathrm{U} & \mathrm{V} & \mathrm{W} & \mathrm{X} & \mathrm{Y} & \mathrm{Z} & \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D} & \mathrm{E} \\
+\hline \mathrm{\color{red}E} & \mathrm{F} & \mathrm{G} & \mathrm{H} & \mathrm{I} & \mathrm{J} & \mathrm{K} & \mathrm{L} & \mathrm{M} & \mathrm{N} & \mathrm{O} & \mathrm{P} & \mathrm{Q} & \mathrm{R} \\
+\hline \mathrm{\color{red}V} & \mathrm{W} & \mathrm{X} & \mathrm{Y} & \mathrm{Z} & \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D} & \mathrm{E} & \mathrm{F} & \mathrm{G} & \mathrm{H} & \mathrm{I} \\
+\hline
+\end{array}\\
+&\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline \mathrm{O} & \mathrm{P} & \mathrm{Q} & \mathrm{R} & \mathrm{S} & \mathrm{T} & \mathrm{U} & \mathrm{V} & \mathrm{W} & \mathrm{X} & \mathrm{Y} & \mathrm{Z} \\
+\hline \mathrm{F} & \mathrm{G} & \mathrm{H} & \mathrm{I} & \mathrm{J} & \mathrm{K} & \mathrm{L} & \mathrm{M} & \mathrm{N} & \mathrm{O} & \mathrm{P} & \mathrm{Q} \\
+\hline \mathrm{S} & \mathrm{T} & \mathrm{U} & \mathrm{V} & \mathrm{W} & \mathrm{X} & \mathrm{Y} & \mathrm{Z} & \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D} \\
+\hline \mathrm{J} & \mathrm{K} & \mathrm{L} & \mathrm{M} & \mathrm{N} & \mathrm{O} & \mathrm{P} & \mathrm{Q} & \mathrm{R} & \mathrm{S} & \mathrm{T} & \mathrm{U} \\
+\hline
+\end{array}
+\end{aligned}
+$$
+
+~\\
+
+其中，密钥(Key)为${\color{red}REV}$
+
+对明文${\color{red}Avenged\ Sevenfold}$进行加密：
+
+$$
+\begin{aligned}
+&\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline \mbox{明文}&\mathrm{A} & \mathrm{V} & \mathrm{E} & \mathrm{N} & \mathrm{G} & \mathrm{E} & \mathrm{D} & \mathrm{S} & \mathrm{E} & \mathrm{V} & \mathrm{E} & \mathrm{N} & \mathrm{F}& \mathrm{O}& \mathrm{L}& \mathrm{D} \\
+\hline  Key 1&{\color{red}R}& && {\color{red}E} && &{\color{red}U}& &&{\color{red}M} && &{\color{red}W}& &&{\color{red}U}\\
+\hline  Key 2&& {\color{blue}Z}&& &{\color{blue}K}& &&{\color{blue}W} && &{\color{blue}I}& &&{\color{blue}S} &&\\
+\hline  Key 3&& &{\color{green}Z}& &&{\color{green}Z} && &{\color{green}Z}& &&{\color{green}I} && &{\color{green}G}&\\
+\hline  \mbox{密文}&R&Z&Z&E&K&Z&U&W&Z&M&I&I&W&S&G&U\\
+\hline 
+\end{array}\\
+\end{aligned}
+$$
+
+得到密文$RZZEKZUWZMIIWSGU$ $\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box$
+
+~\\
+
+多字母替代的密钥空间等于26的密钥长度次方。如果Key = WATER， 则密钥空间为$26^{5}$。
+
+其安全性再被发明后的三个世纪内都没有被破解。直至1863年被查尔斯·巴贝奇（Charles Babbage）使用Kasiski's 测试
+，利用推断Key的长度，破解多字母替代加密法。
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+

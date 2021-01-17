@@ -1,0 +1,254 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{仿射密码}
+
+
+\author{
+Affine Cipher\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+\begin{document}
+\maketitle
+
+\section{模逆元}
+\textit{模逆元(Modular Multiplicative Inverse)。 如果存在$A \cdot C = 1 \bmod B$, ，则C
+是B模下A的模逆。 即： $C = A^{-1} \bmod B$。}
+\textit{
+如果$A^{-1}$存在,则A在B模下是可逆的。
+}
+
+\textbf{例1}
+
+令$B = 26$，找到26以内的所有A逆。
+
+模26的逆：
+
+$$
+\begin{array}{cc}
+ {1^{-1} \equiv 1(\bmod 26)} & 3^{-1} \equiv 9(\bmod 26) \\
+ 9^{-1} \equiv 3(\bmod 26) & 5^{-1} \equiv 21(\bmod 26) \\ 
+ 21^{-1} \equiv 5(\bmod 26) & 7^{-1} \equiv 15(\bmod 26) \\ 
+ 15^{-1} \equiv 7(\bmod 26) & 11^{-1} \equiv 19(\bmod 26) \\
+ 19^{-1} \equiv 11(\bmod 26) & 17^{-1} \equiv 23(\bmod 26)\\
+ 23^{-1} \equiv 17(\bmod 26) & 25^{-1} \equiv 25(\bmod 26)\\
+\end{array}
+$$
+
+其他26以内的数不存在。
+
+\section{最大公约数}
+最大公约数(greatest common divisor)。让$d,n$为整数。当d除n或者n被d除时，表示为$d|n$，读作“d 整除n”。如果存在一个整数$r$, 使得$n=d \cdot r$。所以d是n的约数(divisor)。
+
+设两个非零整数$m,n$，他们的共同约数是正整数$d$,则$d|m$ 和 $d|n$。
+
+他们的最大公约数(GCD)拥有一个共同约数$d$，并使得d大于其他约数。记作$d = gcd(m,n)$。
+
+如果$gcd(m,n) = 1$，则称$m,n$互质(coprime)。
+
+当且仅当$gcd(a,n) = 1$时，a在n模下是可逆的。
+
+
+\textbf{例2}
+
+寻找60和42的最大公约数。
+
+解：
+
+$$60 = 2^{2} + 3^{1} + 5^{1}$$
+
+$$42 = 2^{1} + 3^{1} + 7^{1}$$
+
+使用质因数分解法，gcd是所有共同的质数和最小的次方相乘。
+$gcd = 2^{1} + 3^{1} = 6$
+
+\section{仿射密码}
+仿射密码(Affine cipher)是一种替换密码。它需要几个条件：
+\begin{enumerate}
+\item a和b是整数；
+\item a和26互质,即$gcd(a,26)=1$；
+\item $0 \leq b\leq 25$；
+\end{enumerate}
+
+加密过程是$y=E(x)=a x+b \bmod 26 $
+
+解密过程是$x=D(y)=a^{-1}(y-b) \bmod 26$
+
+~\\
+
+\textbf{例3}
+
+加密明文$SWORD$，令$a=9,b=15$
+
+解：
+
+\setlength{\tabcolsep}{1mm}{
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}% 通过添加 | 来表示是否需要绘制竖线
+\hline  % 在表格最上方绘制横线
+0&1&2&3&4&5&6&7&8&9&10&11&12&13&14&15&16&17&18&19&20&21&22&23&24&25\\
+\hline  %在第一行和第二行之间绘制横线
+A&B&C&D&E&F&G&H&I&J&K&L&M&N&O&P&Q&R&S&T&U&V&W&X&Y&Z\\
+\hline % 在表格最下方绘制横、
+\end{tabular}
+}
+
+
+$$
+\begin{array}{|c|c|c|c|c|c|}
+\hline \text { \mbox{明文} } & \mathrm{S} & \mathrm{W} & \mathrm{O}  & \mathrm{N} & \mathrm{D} \\
+\hline x & 18 & 22 & 14 & 17 & 3 \\
+\hline y=ax+b \bmod 26 & {\color{blue}21} & {\color{blue}5} & {\color{blue}11} & {\color{blue}12} & {\color{blue}16} \\
+\hline \text { \mbox{密文} } &  {\color{red}\mathrm{V}} &  {\color{red}\mathrm{F}} &  {\color{red}\mathrm{L}} &  {\color{red}\mathrm{M}} &  {\color{red}\mathrm{Q}} \\
+\hline
+\end{array}
+$$
+
+~\\
+
+\textbf{例4}
+
+解：
+
+解密$SYLNH$，令$a=19,b=13$
+
+$a^{-1} = 11$
+
+$$
+\begin{array}{|c|c|c|c|c|c|}
+\hline \text { \mbox{明文} }  & \mathrm{S} & \mathrm{Y} & \mathrm{L} & \mathrm{N} & \mathrm{H} \\
+\hline y & 18 & 24 & 11 & 13 & 7 \\
+\hline x=a^{-1}(y-b) \bmod 26 & {\color{blue}3} & {\color{blue}17} & {\color{blue}4} & {\color{blue}0} & {\color{blue}12} \\
+\hline  \text { \mbox{密文} }  & {\color{red}D} & {\color{red}R} & {\color{red}E} & {\color{red}A} & {\color{red}N} \\
+\hline
+\end{array}
+$$
+
+\clearpage
+
+\textbf{例5}
+
+加密I CAN PLAY，令$a=7,b=25$
+\begin{lstlisting}
+Plaintext = 'ICANPLAY'#字母需要大写
+a = 7
+b = 25
+
+Ciphertext = ''
+for i in Plaintext:
+    x = ord(i) -65 
+    y = (a*x + b)%26
+    Ciphertext += chr(y+ 65) 
+\end{lstlisting}
+
+输出：DNZMAYZL
+
+~\\
+
+\textbf{例6}
+
+如果已知明文开头是$GO$，并用仿射密码加密。破解密文$EKTWQMRVRVWQMTF$。
+
+解：
+
+已知：
+$$
+\begin{array}{l}
+G \rightarrow E \\
+O \rightarrow K
+\end{array}
+$$
+
+$G = 6,O = 14$为$x$, 代入$ax+b=y \bmod 26$,等于$y,4=E,10=K$，解二元一次方程。
+
+$$
+\left\{\begin{array}{l}
+6 a+b=4\\
+14 a+b=10
+\end{array}\right \bmod 26 .
+$$
+
+$$
+\left\{\begin{array}{l}
+6 a+b=4\\
+14 a+b=10
+\end{array}\right \bmod 26 \quad \Rightarrow \quad
+\left\{\begin{array}{l}
+a = 4 \\
+b= 6 
+\end{array}\right \bmod 26 \quad or 
+\left\{\begin{array}{l}
+a = 17 \\
+b= 6 
+\end{array}\right \bmod 26
+$$
+
+然后$gcd(4,6) \ne 1, (4,6)$不是互质，而$gcd(17,6) =1$,所以$a= 17,b=6$。
+
+根据$x=a^{-1}(y-b) \bmod 26$，明文为GONE WITH THE WIND
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+

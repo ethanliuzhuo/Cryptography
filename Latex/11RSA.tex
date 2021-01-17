@@ -1,0 +1,451 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{amssymb}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+\usepackage{soul}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes.geometric}
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{RSA加密算法}
+
+
+\author{
+RSA\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+\begin{document}
+\maketitle
+
+
+\section{现代密码学}
+
+现代密码学的假设:
+
+\begin{enumerate}
+\item 对手知道正在使用的系统;
+\item 对手可以访问任意数量的相应的明文-密文对;
+\item 对手可以访问加密转换$E_k(M) = C$中使用的密钥;
+\item 安全性是对手不能构造解密变换$D_k(C) = M$。
+\end{enumerate}
+
+\textit{\textbf{定义1：}如果反映射$D_k$的构造在理论上非常复杂，以至于我们现在的计算工具无法实现，那么映射$E_k$就是一个trapdoor函数。}
+
+\textbf{例1}
+
+设两个因子p,q，其中
+
+\begin{eqnarray}   
+\label{eq}
+p &=& 16347336458092538484431338838650908598417836700330 \nonumber \\ 
+&&92312181110852389333100104508151212118167511579 \nonumber \\
+q &=& 1900871281664822113126851573935413975471896789968 \nonumber \\ 
+&&515493666638539088027103802104498957191261465571 \nonumber \\ 
+p \cdot q &=&  3107418240490043721350750035888567930037346022842727545720161948823\nonumber \\ 
+&&2064405180815045563468296717232867824379162728380334154710731085019  \nonumber \\ 
+&&19548529007337724822783525742386454014691736602477652346609\nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+尝试因式分解。
+$\hfill\square$ 
+
+\section{数论}
+
+\textit{\textbf{定义2：} Euler $\varphi$ (n) 函数计算在封区间[1,n]内与n没有公因数的整数的个数。也就是说,
+$$
+\begin{aligned}
+&\varphi(n)=\#\{m \in \mathbb{Z}: 1 \leq m \leq n, \operatorname{gcd}(m, n)=1\}\\
+\end{aligned}
+$$
+}
+
+$$
+\begin{array}{c|ccccccccccccccc}
+n & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 \\
+\hline \varphi(n) & 1 & 1 & 2 & 2 & 4 & 2 & 6 & 4 & 6 & 4 & 10 & 4 & 12 & 6 & 8
+\end{array}
+$$
+
+\textit{\textbf{引理1}：如果m,n为正整数，使得gcd(m,n)= 1,则：}
+$$\varphi(mn) = \varphi(m)\varphi(n)$$
+
+\textbf{例2}
+
+$$\varphi55) = \varphi(5 \times 11) = \varphi(5)\varphi(11) = 4 \times 10$$
+
+
+$\hfill\square$ 
+
+\textit{\textbf{定义3：} 莫比斯公式：
+$$
+\begin{aligned}
+&\mu(d)=\left\{\begin{array}{ll}
+(-1)^{k} \mbox{如果d是k个不同质数的乘积} \\
+0 & \mbox{其他} 
+\end{array}\right.\\
+\end{aligned}
+$$
+$$
+\begin{array}{c|ccccccccccccccc}
+d & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 \\
+\hline \mu(d) & 1 & -1 & -1 & 0 & -1 & 1 & -1 & 0 & 0 & 1 & -1 & 0 & -1 & 1 & 1
+\end{array}
+$$
+}
+
+$4 = 2 \cdot 2$，有相同的质数所得，所以是0，$12 = 2 \cdot 2 \cdot 3$也有相同质数所得，所以是0。$15 = 3 \cdot 5$由不同质数所得，所以是$(-1)^2 = 1$
+
+\textit{\textbf{引理2}：假设m和n没有公因数。进一步假设m是k个不同素数的乘积n是r个不同素数的乘积。那么mn就是k + r不同质数的乘积,即：
+}
+
+$$\mu(mn) = (-1)^{k+r} = (-1)^k(-1)^r = \mu(m)\mu(n)$$
+
+\textit{\textbf{定理1}: 如果n是一个正整数，则可以被质因数分解：}
+$$n = p_1^{a_1}p_2^{a_2}\cdots p_r^{a_r}$$
+
+\textit{进一步表示为：}
+$$\varphi(n) = n \left(1 - \frac{1}{p_1} \right)\left(1 - \frac{1}{p_2}\right) \cdots \left(1 - \frac{1}{p_r}\right)$$
+
+
+\textbf{例3}
+
+计算 $\varphi(360)$:
+
+
+\begin{eqnarray}   
+\label{eq}
+360&=& 2 \cdot 180  \nonumber \\ 
+&=&  2  \cdot 2 \cdot 90 \nonumber \\ 
+&=& 2  \cdot 2  \cdot 2  \cdot 45  \nonumber \\ 
+&=& 2  \cdot 2  \cdot 2  \cdot 3  \cdot 3 \cdot 5 \nonumber \\ 
+&=& 2^3 \cdot 3^2 \cdot 5 \nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+
+\begin{eqnarray}   
+\label{eq}
+\varphi(360)&=& n \left(1 - \frac{1}{p_1} \right)\left(1 - \frac{1}{p_2}\right) \cdots \left(1 - \frac{1}{p_r}\right)  \nonumber \\ 
+&=&  360 \left(1 - \frac{1}{2} \right)\left(1 - \frac{1}{3}\right)\left(1 - \frac{1}{5}\right) \nonumber \\ 
+&=& 96 \nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+\begin{lstlisting}
+# 计算欧拉公式值
+def gcd(p,q):
+    while q != 0:
+        p, q = q, p%q
+    return p
+
+def is_coprime(x, y):
+    return gcd(x, y) == 1
+
+def phi(x):
+    if x == 1:
+        return 1
+    else:
+        n = [y for y in range(1,x) if is_coprime(x,y)]
+        return len(n)
+print(phi(360))
+\end{lstlisting}
+$\hfill\square$ 
+
+那么$\varphi(n)$和$\mu(d)$有什么关系呢？
+
+$$\varphi(n) = \sum_{d|n}\mu(d)\frac{n}{d}$$
+
+~\\
+
+\textbf{例4}
+
+让$n = p_1^{a_1}p_2^{a_2}$
+
+则$p_1^{i}p_2^{j}$, $0 \leq i \leq a_1$,$0 \leq j \leq a_2$
+
+\begin{itemize}
+\item $ d =  p_1^{0}p_2^{0} = 1\Rightarrow	\mu(1) = (-1)^0 = 1$
+\item $ d =  p_1^{1}p_2^{0} = p_1\Rightarrow	\mu(p_1) = (-1)^1 = -1$
+\item $ d =  p_1^{0}p_2^{1} = p_2\Rightarrow	\mu(p_2) = (-1)^1 = -1$
+\item $ d =  p_1^{0}p_2^{1} = p_1p_2\Rightarrow	\mu(p_1p_2) = (-1)^2 = 1$
+\end{itemize}
+
+\begin{eqnarray}   
+\label{eq}
+\varphi(n)&=&  \mu(1) \cdot \frac{n}{1} + \mu(p_1) \cdot \frac{n}{p_1}+ \mu(p_2) \cdot \frac{n}{p_2}+ \mu(p_1p_2) \cdot \frac{n}{p_1p_2}\nonumber \\ 
+&=&  n - \frac{n}{p_1} - \frac{n}{p_2} + \frac{n}{p_1p_2} \nonumber \\ 
+&=& n\left(1- \frac{1}{p_1}\right)\left(1- \frac{1}{p_2}\right) \nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+$\hfill\square$ 
+
+~\\
+模运算的两个基本结果:
+
+\begin{enumerate}
+\item \textit{\textbf{定理2(费马 Fermat)}:如果p是一个素数a是一个不能被p整除的整数，那么}
+$$a^{p-1} \equiv 1 \quad (mod \quad p)$$
+\item \textit{\textbf{定理3(欧拉 Euler)}:如果a和n是相对素数的非零整数，那么}
+$$a^{\varphi(n)} \equiv 1 \quad (mod \quad n)$$
+\end{enumerate} 
+
+~\\
+
+\textbf{例5}
+$$
+115 = 5 \cdot 23  \Rightarrow \varphi(115) = \varphi(5)\varphi(23) = 4 \cdot 22 = 88
+$$
+$$
+ {\underbrace{12659}_{{\color{red}a}}}^{ \overbrace{88}^{{\color{red}\varphi(n)}}} \equiv 1 \quad mod  \quad \underbrace{115}_{{\color{red}n}}
+$$
+$\hfill\square$ 
+
+\section{RSA}
+
+RSA加密算法是一种非对称加密算法，在公开密钥加密和电子商业中被广泛使用。RSA是由罗纳德·李维斯特（Ron Rivest）、阿迪·萨莫尔（Adi Shamir）和伦纳德·阿德曼（Leonard Adleman）在1977年一起提出的。当时他们三人都在麻省理工学院工作。RSA 就是他们三人姓氏开头字母拼在一起组成的。
+
+它是基于这样一个假设:两个素数相乘很容易，但将两个素数的乘积分解成质数分量却很难。到目前为止，世界上还没有任何可靠的攻击RSA算法的方式。只要其密钥的长度足够长，用RSA加密的信息实际上是不能被破解的。
+
+\subsection{RSA使用步骤}
+
+\begin{enumerate}
+\item (密钥创建，私钥) ${\color{red}Bob}$ 选择两个只有自己执导的质数 p 和 q， 然后计算$N = p \cdot q$; 
+\item ${\color{red}Bob}$ 选择一个正整数素数的加密指数(encryption exponent)e，计算$\varphi(N) = (p-1)(q-1)$;
+\item ${\color{red}Bob}$公开 N 和 e；
+\item (加密) ${\color{blue}Alice}$将明文m, 使用${\color{red}Bob}$公开的密钥加密。密文计算方法为$c \equiv m^e \quad (mod \quad N)$；
+\item ${\color{blue}Alice}$发送密文c给${\color{red}Bob}$;
+\item (解密)${\color{red}Bob}$解开密文c，一共两步：
+\begin{enumerate}
+\item $d \equiv e^{-1}(\bmod \quad \varphi(N)) \equiv e^{-1}(\bmod \quad  (p-1)(q-1))$
+\item $m \equiv c^d (\bmod \quad  N)$
+\end{enumerate}
+\end{enumerate}
+
+\subsection{RSA安全性}
+
+假设${\color{blue}Eve}$ 已经知道公钥${\color{red}N,e}$ 和密文 ${\color{red}c}$，想要得到d。那么${\color{blue}Eve}$需要尝试解方程
+$$d \cdot e \equiv 1 \quad (\bmod \quad \varphi(N))$$
+
+但是仅从N得到$\varphi(N)$等价于分解N，这是非常困难的，因为：
+
+
+$$\varphi(N)  = (p-1)(q-1)=pq - p -q + = N -(p+q)+1$$
+
+为了得到到$\varphi(N)$,但有两件事困扰着你：
+\begin{enumerate}
+\item 将$N$分成两个质数$p,q$从目前计算机算力角度来说是非常困难的；
+\item $p,q$的和从未公开
+\end{enumerate}
+
+虽然难以破解，但假如${\displaystyle N}$的长度小于或等于256位，那么用一台个人电脑在几个小时内就可以暴力因数分解它的因子了。但当N很大时，破解难度和时间就会飞增。现在加密系统中，一般采取2048位长度的${\displaystyle N}$来确保安全性
+
+\subsection{RSA加密方法}
+
+为了发送消息，即一段字符串，我们需要将将消息转换为数字，反之亦然。
+
+基本思想是使用字母数量等于N以26为基数的对数。为了得到的任何k位数字(以26为底)都必须小于N，所以我们必须有
+$$N \ge 26^k - 1 \Rightarrow k = \log_26(N)$$
+
+k为整数，向下取整。这里的k就是一次性能发送多少位字符的数量。比如说$N =131 \cdot 1873 = 245363 \Rightarrow k = \log_26(245363) = 3$，也就是说使用质数$p=131,q=1873$时，一次可以加密3个字符的信息发送给对方。
+
+\textbf{例6}
+
+令明文$m = \textbf{THE}$
+
+那么 $m = {\color{red}\textbf{T}} \cdot 26^0 + {\color{blue}\textbf{H}} \cdot 26^1 +  {\color{green}\textbf{E}} \cdot 26^2 = {\color{red}19} + {\color{blue}7} \cdot 26 + {\color{green}4} \cdot 26^2 = 2905$
+
+又已知$e = 323,N = 245363$，所以$2905^323 \equiv 13388 \quad (\bmod \quad 245363)$
+
+那么如果是以拉丁字母表26个字母为基底的话，加密过程如下：
+
+\begin{eqnarray}   
+\label{eq}
+13388&=& 24 + 514 \cdot {\color{red}26}   \nonumber \\ 
+&=&  24 + (20 + 19 \cdot {\color{red}26} ) \cdot {\color{red}26}  \nonumber \\ 
+&=& 24 \cdot 1 + 20 \cdot {\color{red}26} + 19 \cdot {\color{red}26}^2  \nonumber \\ 
+&=& \textbf{Y}\cdot {\color{red}26}^0 + \textbf{U}\cdot {\color{red}26}^1 + \textbf{T}\cdot {\color{red}26}^2 \nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+所以明文\textbf{THE}通过RSA可以加密为\textbf{YUT}
+
+$\hfill\square$ 
+
+\subsection{幂取模运算Power in modulo arithmetic}
+
+\textbf{定理4：} 如果 a,n,x,y是非负整数并且满足$gcd(a,n) = 1$，则：
+$$x \equiv y \quad (\bmod \quad \varphi(n) \Rightarrow a^x \equiv a^y \quad (\bmod \quad n))$$
+
+证明：
+
+
+\begin{eqnarray}   
+\label{eq}
+x &\equiv& y \quad (\bmod \quad \varphi(n)  \nonumber \\ 
+&\equiv& y + k \cdot  \varphi(n) \nonumber \\ 
+&\Rightarrow& a^x = a^{y + k \cdot  \varphi(n)} \nonumber \\ 
+&\Rightarrow& a^x = a^{y} + a^{k \cdot  \varphi(n)} \nonumber \\ 
+&\Rightarrow& a^x = a^{y} + a^{\varphi(n)}^k \nonumber \\ 
+&\Rightarrow& a^x = a^{y} \quad (\bmod \quad n) \nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+\textbf{例7}
+
+$$7^42 \quad (\bmod \quad 11)$$
+
+$$42 \equiv 2  (\bmod \quad \varphi(11)) = 2  (\bmod \quad 10)$$
+
+$$7^42 \equiv 7^2  (\bmod \quad 11) = 49 (\bmod \quad 11) = 5$$
+$\hfill\square$ 
+
+\subsection{计算大数的余}
+
+\textbf{例8}
+
+如果计算$1915793^{2641} \quad (\bmod \quad 5678923)$这种大数的mod呢？我们不想处理大于$n^2$的数字。应用定理4.
+
+第一步：
+
+a = 1915793,k = 5678923,n = 5678923
+
+将k转化为二进制数,
+
+$$k = 5678923 = 1 + 2^4+2^6+2^9+2^11 = 1+16+64+512+2048$$
+
+\begin{lstlisting}
+#二进制数
+number = 2641
+number_bin = bin(number)[2:]
+
+cov_number_bin = bin(number)[2:][::-1]
+
+sum_number = ''
+
+for i in range(len(cov_number_bin)):
+    if cov_number_bin[i] == '1':
+        # print(i)
+        if sum_number == '':
+            sum_number += str(2**(i))
+        else:
+            sum_number += ' + ' + str(2**(i))
+            
+
+print(sum_number)
+\end{lstlisting}
+
+第二步：
+
+用重复的平方来得到上面的幂的余：
+
+$a^2 \equiv 3278564 \quad (\bmod \quad n)$，得到3278564，就可以继续使用作为$a^4$的基本单位，不用计算$a^4$，只需要计算$a^4 \quad (\bmod \quad n)= (a^2)^2 \quad (\bmod \quad n)= 3278564^2 \quad (\bmod \quad n) \equiv 1631541 \quad (\bmod \quad n)  $。得到1631541后又可以继续应用在$a^8$上，使得$a^8  \quad (\bmod \quad n) = (a^4)^2  \quad (\bmod \quad n) = 1631541^2  \quad (\bmod \quad n) \equiv 4704430  \quad (\bmod \quad n) $。以减少运算量，以此列推，得到所有a的2的幂次项的余。
+
+$$
+\begin{array}{lll}
+a^{2} \equiv 3278564 \quad (\bmod \quad n) & a^{4} \equiv 1631541 \quad (\bmod \quad n) & a^{8} \equiv 4704430 \quad  \quad (\bmod \quad n) \\
+a^{16} \equiv 1424066 \quad (\bmod  \quad n) & a^{32} \equiv 3532287 \quad (\bmod \quad n) & a^{64} \equiv 3305529 \quad (\bmod \quad n) \\
+a^{128} \equiv 1529537 \quad (\bmod \quad n) & a^{256} \equiv 5673135 \quad (\bmod \quad n) & a^{512} \equiv 5106329 \quad (\bmod \quad n) \\
+a^{1024} \equiv 2627277 \quad (\bmod \quad n) & a^{2048} \equiv 1180227 \quad (\bmod \quad n) & \cdots
+\end{array}
+$$
+
+第三步：
+
+
+\begin{eqnarray}   
+\label{eq}
+a^{k} &=& a \cdot a^{16} \cdot a^{64} \cdot a^{512} \cdot a^{2048}  \nonumber \\ 
+ &=& 1915793 \cdot 1424066 \cdot 3305529 \cdot 5106329 \cdot 1180227 \quad (\bmod \quad n) \nonumber \\ 
+ &=&  1162684 \quad (\bmod \quad n) \nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+$\hfill\square$ 
+
+\subsection{完整的一次RSA加密和解密过程}
+
+\textbf{例9}
+
+选择$p=53,q = 89$,已知加密因子和解密因子$e = 119,d = 424$
+
+首先检查满足$e \cdot d \equiv 1 \quad (\bmod \quad \varphi(4717))= 1 \quad (\bmod \quad (53-1)(89-1))  = 1 \quad (\bmod \quad 4576) $
+
+1. 加密明文75
+
+第一步：
+$$N = p \times q = 53 \cdot 89 =4717$$
+
+第二步：
+$$c = m^e \quad (\bmod \quad N) = 75^{119} \quad (\bmod \quad 4717) = 3500$$
+
+第三步：
+$$119 = 2^0+2^1+2^2+2^4+2^5+2^6 = 1+2+4+16+32+64$$
+
+第四步：
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|}
+\hline
+k & 1 & 2 & 4 & 8 & 16 & 32 & 64 \\
+\hline
+75^k \quad (\bmod \quad N) & 75 &908&3706&3249&4072&929&4547\\
+\hline
+\end{array}
+$$
+
+$$75^{119} = 75\cdot908\cdot3706\cdot3249\cdot4072\cdot929\cdot4547 \quad (\bmod \quad 4717)  = 3530$$
+
+2. 解密密文2
+
+$$m = c^d \quad (\bmod \quad N) = 2^{423} \quad (\bmod \quad 4717) = 3414$$
+
+$\hfill\square$ 
+
+
+\end{document}
+

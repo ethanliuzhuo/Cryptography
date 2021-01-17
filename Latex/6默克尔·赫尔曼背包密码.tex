@@ -1,0 +1,315 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+\usepackage{soul}
+
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{默克尔-赫尔曼背包密码}
+
+
+\author{
+Merkle-Hellman Knapsack Cipher\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+\begin{document}
+\maketitle
+
+\section{欧几里得算法-伯利坎普}
+欧几里得算法(Euclidean Algorithm),也称为辗转相除法。是计算两个给定整数A和B的最大公因数d的过程。其中$A > B$。
+
+伯利坎普对欧几里得算法略微进行修改，可以计算得到B的逆 mod A( inverse of B mod A)。也称伯利坎普算法(Berlekamp Algorithm).
+
+\textbf{算法步骤：}
+\begin{enumerate}
+\item 设$r_{-2}=A, r_{-1}=B, p_{-2}=0, p_{-1}=1, q_{-2}=1, q_{-1}=0$；
+\item 对于 $k = 0,1,2,....$, 逐个计算；
+$$
+\begin{array}{l}
+a_{k} = r_{k-2} \div r_{k-1}\mbox{(取整)}\\
+r_{k-2}=a_{k} r_{k-1}+r_{k} \\
+p_{k}=a_{k} p_{k-1}+p_{k-2} \\
+q_{k}=a_{k} q_{k-1}+q_{k-2}
+\end{array}
+$$
+\item 当$r_{n}=0$, 停止计算；
+
+然后$r_{n-1}=\operatorname{gcd}(A, B)$。此外，在这种情况下 $\operatorname{gcd}(A, B)=1$，并且
+$$
+B \cdot(-1)^{n} p_{n-1}=1+A \cdot(-1)^{n} q_{n-1}
+$$
+\end{enumerate}
+
+如果$\operatorname{gcd}(A, B) \ne 1$,则$B^{-1}$不存在。
+
+\textbf{例1}
+
+计算115的逆并 mod 12659.
+
+解：
+
+$$
+\begin{array}{|c|c|c|c|c|}
+\hline \mathrm{k} & \mathrm{r} & \mathrm{a} & \mathrm{p} & \mathrm{q} \\
+\hline-2\mbox{(初始)} & {\color{red}12659(A)} & & 0\mbox{(初始)} & 1\mbox{(初始)} \\
+\hline-1\mbox{(初始)} & {\color{red}115(B)} & & 1\mbox{(初始)} & 0\mbox{(初始)} \\
+\hline 0 & 9 & 110 & 110 & 1 \\
+\hline 1 & 7 & 12 & 1321 & 12 \\
+\hline 2 & 2 & 1 & 1431 & 13 \\
+\hline 3 & 1 & 3 & {\color{green}5614} & 51 \\
+\hline 4(\mbox{停止计算}) & 0 & 2 & {\color{red}12659(A)} & {\color{red}115(B)} \\
+\hline
+\end{array}
+$$
+
+$B^{-1} = (-1)^{n}P_{n-1}=(-1)^{4}5614 = 5614$ \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad   \Box
+
+\section{子集和问题}
+子集和问题(Subset-Sum Problem)。给定一串递增数列$a_{1}<a_{2}< \cdots < a_{n}$和一个目标数字M。问递增数列是否存在某个非空子集，使得子集内中的数字和为M。即
+$$x_1a_1+x_2a_2+\cdots+x_na_n = M$$
+其中$x_i$ 为0或1，$x_i$ 不全为0
+
+
+
+定义：\textbf{超级递增序列(a super-increasing sequence)}是序列中每一个数都大于它之前所有数的总和。即：
+$$
+a_{k}>\sum_{i=0}^{k-1} a_{i}
+$$
+
+注意，有时候存在多组解。
+
+~\\
+
+\textbf{例2}
+
+数列$[3,5,11,23,51],M=67$，尝试解决SSP问题。
+
+解：
+
+$$67=51+11+5=a_2+a_3+a_5$$
+$$x=[0,1,1,0,1]$$
+
+即存在一组序列x使该问题可以被解决。\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad   \Box
+
+~\\
+
+\textbf{例3}
+
+数列$[13,18,35,72,155,301,595],M=1003$，尝试解决SSP问题。
+
+解：
+
+\begin{eqnarray}   
+\label{eq}
+1003&=&595 + 408 \nonumber \\ 
+&=&  595+301+107\nonumber \\ 
+&=& 595+301+72+35\nonumber \\ 
+&=& a_3+a_4+a_6+a_7\nonumber \\ 
+x&=&[0,0,1,1,0,1,1]\nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+即存在一组序列x使该问题可以被解决。\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad   \Box
+
+\clearpage
+
+\section{默克尔-赫尔曼背包密码}
+
+\textbf{加密过程}：
+
+\begin{enumerate}
+\item {\color{red}Bob}作为收信人(receiver)
+\begin{itemize}
+\item 选择一个超级递增序列(a super-increasing sequence) a = $(a_1,a_2,...,a_n)$
+\item 选择一个质数$p > \sum_{i=1}^{n} a_i$ 
+\item 选择一个加密因子A，A必须 满足$2 \leq A \leq p-1$
+\item 保留为秘密，不公开
+\end{itemize}
+\item {\color{red}Bob}计算出$b_i$序列，$b_i = A \cdot a_i \bmod p$，然后把序列发送给{\color{blue}Alice}作为发信人(sender)
+\item {\color{blue}Alice}收到{\color{red}Bob}发送的序列后，需要利用这串序列加密明文，假设明文为二进制 信息$x_1x_2x_3...x_n$，由n个0或1组成。$x_i$为ASCII二进制的所在位置，计算
+$$C = x_1b_1+x_2b_2+...+x_nb_n$$
+然后将C发送给{\color{red}Bob}。注意：如果字符串长度少于n，则补齐；长度大于n，则截取分段发送。
+\item {\color{red}Bob}收到{\color{blue}Alice}发送的信息后，开始解密。先计算$M = A^{-1}C \bmod p$,然后解决SSP问题
+$$x_1a_1+x_2a_2+\cdots+x_na_n = M$$
+
+计算得出序列X，即可得知二进制信息$x_1x_2...x_n$，再通过ASCII表格翻译成字符。
+\end{enumerate}
+
+~\\
+
+\textbf{例4}
+
+{\color{red}Bob}选择了一个序列
+$$
+\left(a_{1}, a_{2}, \ldots, a_{8}\right)=(2,5,9,22,47,99,203,409)
+$$
+和质数$p=997$和加密因子 $A=60$.
+
+\begin{enumerate}
+\item 则序列b是
+$$b = 60 \times (2,5,9,22,47,99,203,409) \bmod 997
+= (120, 300, 540, 323, 826, 955, 216, 612)
+$$
+
+{\color{blue}Alice}收到序列b后，加密信息"$b$",$b$的ASCII二进制代码为：01100010.
+
+\item 则C为：
+$$C = 0 \cdot b_1 + 1\cdot b_2 + \cdots +0 \cdot b_8 =1056$$
+
+\item {\color{red}Bob}收到C后，尝试解密。
+使用Python代码计算$A^{-1}$，方法为：
+$$\hl{\textit{ pow(A, -1, p)}}$$
+$$A^{-1} = \textit{ pow(60, -1, 997)} = 781$$
+
+\item 计算$M =A^{-1} \cdot C \bmod p $
+$$M  = 781 \cdot 1056 \bmod 997 = 217$$
+
+\item 解决SSP问题
+$$217 = 5+9+203 = a_2 + a_3 + a_7$$
+$$X = (0,1,1,0,0,0,1,0) $$
+
+\item 根据二进制代码转化为字符\textbf{'b'}
+\end{enumerate}
+
+\clearpage
+
+\textbf{例5}
+
+\begin{lstlisting}
+Plaintext = 'AGREE' #明文
+
+a = [2,5,9,22,47,99,203,409] #Bob设置超级递增数列
+p = 997  #Bob设置质数
+A = 60 #Bob设置加密因子
+
+b  = [i*A%p for i in a] #求b数列，发送给Alice
+
+A_inv = pow(A,-1,p) #Bob求A的逆
+
+def subset_sum(t,s,x,n,M,a,X):
+    """
+    子集和问题求解，返回空集合或者序列X
+
+    Parameters
+    ----------
+    t : int
+        递归深度.
+    s : int
+        子集和.
+    x : dict
+        判断列表，状态为1或0.
+    n : int
+        序列长度.
+    M : int
+        序列长度.
+    a : list
+        集合b，使得x_1b_1+x_2b_2+...+x_nb_n=M.
+    X : list:
+        空list，储存结果
+
+    Returns
+    -------
+    X: list
+    0 或 1.
+    """
+    if t == n:
+        if s == M: 
+            for i in range(0,n):
+                if x[i] != 0: 
+                    X += [1] #取b_i
+                else:
+                    X += [0] #不取b_i
+            
+    else:
+        s = s+a[t]
+        x[t] = a[t]
+        subset_sum(t+1,s,x,n,M,a,X)
+        s = s-a[t]         #回溯之前还原
+        x[t] = 0
+        subset_sum(t+1,s,x,n,M,a,X)
+        
+    return X
+
+        
+for i in Plaintext:
+    """Alice 加密过程"""
+    c_int = ord(i)
+    c_bin = bin(c_int) #将字符转化为二进制
+    c = 0
+    
+    if len(c_bin[2:]) != 8:
+        c_bin = '0'*(8-len(c_bin[2:])) + c_bin[2:] #二进制转为8位二进制，与a长度相同
+    else:
+        c_bin = c_bin[2:]
+        
+    for j in range(8):
+        try:
+            # print(c_bin[j],b[j],j)
+            c += int(c_bin[j])*b[j] #计算c，然后发送给Bob
+        except:
+            pass
+    # print(c)
+     """Bob 解密过程"""
+    M = A_inv * c%p
+    # print(M)
+    
+    t = 0            #递归深度
+    s = 0            #子集和
+    x = {}           #判断列表，状态为1或0
+    n = len(a)
+    X = []
+    
+    X = subset_sum(t,s,x,n,M,a,X) #解决子集和问题
+    # print(X)
+    
+    bin_X = ''
+    for k in X:
+        bin_X += str(k)
+    print(chr(int(bin_X,2))) #二进制转化ASCII字符
+\end{lstlisting}
+
+输出：AGREE
+
+\end{document}
+

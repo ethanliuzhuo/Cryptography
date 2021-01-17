@@ -1,0 +1,286 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+\usepackage{soul}
+
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{维吉尼亚密码及其破译}
+
+
+\author{
+Breaking Vigenère Cipher\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+\begin{document}
+\maketitle
+
+维吉尼亚密码（Breaking Vigenère Cipher）是使用一系列凯撒密码组成密码字母表的加密算法，即多字母替代凯撒密码。属于多表密码的一种简单形式。
+
+
+\section{排列}
+排列(Permutation),是将相异对象或符号根据确定的顺序重排。每个顺序都称作一个排列。即：从n个对象取k个对象的有序排列，其中$k \leq n$。一共有$$
+P(n, k):=n \cdot(n-1) \cdot(n-2) \cdots(n-k+2) \cdot(n-k+1)=\frac{n !}{(n-k) !}
+$$种方法.
+
+\section{组合}
+组合(Combination)，一个集的元素的组合是一个子集。若两个子集的元素完全相同并顺序相异，它仍视为同一个组合。即：从n个对象取k个对象的无序排列，其中$k \leq n$。读作n取k。$$
+C(n, k)=\frac{P(n, k)}{k !}=\left(\begin{array}{l}
+n \\
+k
+\end{array}\right)=\frac{n!}{k!(n-k) !}
+$$
+
+\section{概率}
+对于一项实验，其中存在n种不同的可能性，然后以k种可能的方式出现结果的概率为$\frac{k}{n}$
+
+\textbf{例1}
+
+生日问题。一年有365天，在一个班级中，假设这个班有n个人，求这个班至少有两人在同一天生日的概率。
+
+$$
+\begin{aligned}
+&1-\frac{P(365, n)}{365^{n}}=1-\frac{365 \cdot 364 \cdots(365-n+1)}{365^{n}}\\
+\end{aligned}
+$$
+
+$$
+&\begin{array}{|c|c|c|c|c|c|c|c|c|}
+\hline n & 1 & 2 & 3 & 10 & 20 & 30 & 40 & 50 \\
+\hline p & 0 & 0.0027 & 0.0082 & 0.117 & 0.411 & 0.706 & 0.891 & 0.97 \\
+\hline
+\end{array}
+$$
+
+即代表如果一个班有50个人，基本可以确定至少有两人在同一天生日。
+
+\textbf{例2}
+
+假设甲板上有45张卡。 在这些卡中，有20张标有“ X”，15张标有“ Y”，以及10张“ Z”。随机选择一张牌，放回去，然后随机洗牌并随机选择另一张牌。 
+
+(1)找出第一张是X第二张是Z的概率。
+
+$$
+P(X \ \text { and } \ Z)=\mathbb{P}(x) \cdot \mathbb{P}(z)=\frac{20}{45} \cdot \frac{10}{45}=\frac{8}{81}
+$$
+
+(2)两张卡分别是X和Z
+
+$$
+\begin{aligned}
+\mathbb{P}\left(X \ \text {and } \ Z\right) &=\mathbb{P}(X \ \text { and } \ Z)+\mathbb{P}(Z \ \text { and } \ X) \\
+&=\frac{8}{81}+\frac{8}{81}=\frac{16}{81}
+\end{aligned}
+$$
+
+(3) 两张都是Y
+
+$$
+\mathbb{P}(Y \ \text { and} \ Y)=\mathbb{P}(Y) \cdot \mathbb{P}(Y)=\frac{15}{45} \cdot \frac{15}{15}=\frac{1}{9}
+$$ \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad   \Box
+
+
+下表列出了7834个字母的英语写作样本中的字母的相对频率。
+
+$$
+\begin{array}{|c|c||c|c|}
+\hline \text { Letter } & \text { Relative  frequency (\%) } & \text { Letter } & \text { Relative  frequency (\%) } \\
+\hline \text { A } & 8.399 & \text { N } & 6.778 \\
+\hline \text { B } & 1.442 & \text { O } & 7.493 \\
+\hline \text { C } & 2.527 & \text { P } & 1.991 \\
+\hline \text { D } & 4.800 & \text { Q } & 0.077 \\
+\hline \text { E } & 12.150 & \text { R } & 6.063 \\
+\hline \text { F } & 2.132 & \text { S } & 6.319 \\
+\hline \text { G } & 2.323 & \text { T } & 8.999 \\
+\hline \text { H } & 6.025 & \text { U } & 2.783 \\
+\hline \text { I } & 6.485 & \text { V } & 0.996 \\
+\hline \text { J } & 0.102 & \text { W } & 2.464 \\
+\hline \text { K } & 0.689 & \text { X } & 0.204 \\
+\hline \text { L } & 4.008 & \text { Y } & 2.157 \\
+\hline \text { M } & 2.566 & \text { Z } & 0.025 \\
+\hline
+\end{array}
+$$
+
+随机取两个字母，其两个字母相同的概率为$\mathbb{P}(2 Letter) = \mathbb{P}(2A)+ \mathbb{P}(2B) + \cdots +\mathbb{P}(2Z)=0.08399^{2}+0.01442^{2}+ \cdots +0.00025^{2}=6.5\% $
+
+~\\
+
+\textbf{例3}
+
+1.如果\textbf{凯撒密码}转化字符的方法为$A→D$,密文中随机选择一个字母A的概率是多少？
+
+$$\mathbb{P}(\mbox{密文中的}A)  = \mathbb{P}(\mbox{明文中的}X) = \mathbb{P}(X) = 0.204\%$$
+
+2. 密文中随机选择一个字母B的概率是多少？
+$$\mathbb{P}(\mbox{密文中的}B)  = \mathbb{P}(\mbox{明文中的}Y) = \mathbb{P}(Y) = 2.157\% \quad\quad\quad\quad \quad\quad\quad\quad\quad\quad\quad\quad  \Box$$
+
+
+\textbf{例4}
+假设使用维吉尼亚密码(Vigenère Cipher)，密钥(Key)是$DN$。
+
+（1）密文中A的概率？
+$$\mathbb{P}(\mbox{密文中的}A)  = \mathbb{P}(\mbox{明文中奇数位是}X) + \mathbb{P}(\mbox{明文中偶数位是}N)  = \frac{\mathbb{P}(X)}{2} + \frac{\mathbb{P}(Y)}{2} = 3.491\%$$
+
+（2）密文中B的概率？
+$$\mathbb{P}(\mbox{密文中的}B)  = \mathbb{P}(\mbox{明文中奇数位是}Y) + \mathbb{P}(\mbox{明文中偶数位是}O)  = \frac{\mathbb{P}(Y)}{2} + \frac{\mathbb{P}(O)}{2} = 4.825\%\quad\quad\quad\quad\quad  \Box$$
+
+~\\
+
+以此列推，即使使用长密钥，在密文中看到任何字母的概率将收敛为$\frac{1}{26}$
+
+\textbf{条件概率}是指事件A已经发生了，发生事件B的概率。
+$$\mathbb{P}(B|A) = \frac{\mathbb{P}(B \mbox{和} A)}{\mathbb{P}(A)}$$
+
+\section{重合因子}
+重合因子(Index of Coincidence)是密文中两个随机选择的字母相同的概率，记为$I$。
+
+\begin{itemize}
+\item 如果$I \approx 0.065$，则表示密码很有可能是\textbf{单字母}代替
+\item 对于多字母代替，$I$ 的范围是$\frac{1}{26}=0.0385 \leq I \leq 0.065$
+\end{itemize}
+
+$$I = \frac{1}{n(n-1)} \sum_{i=0}^{25}n_i(n_i-1), 0 \leq i \leq25$$
+其中$n$为文本中所有字符总和。$n_i$为每个字母出现的个数。如A出现五次，记$n_0 = 5$。
+
+如果在拉丁字母表中使用维吉尼亚密码(Vigenère Cipher)，其密钥长度为$k$,，为了估计密钥长度,则可以使用弗里德曼检验(Friedman Test):
+$$\mbox{重合因子} =  I \approx \frac{0.0385 \times n(k-1)+0.065(n-k)}{k(n-1)}$$
+$$\mbox{密钥长度} = k\approx \frac{0.0265n}{(0.065 - I)+n(I - 0.0385)}$$
+
+弗里德曼检验仅仅只能估计密钥长度$k$，但密文长度也\textbf{不能太短}。
+
+\clearpage
+\textbf{例5}
+
+已知密文使用维吉尼亚密码(Vigenère Cipher)加密，密文总长为$n=337$，每个字母出现频率如表格所示。估计密钥长度$k$是多少。
+
+解：
+$$
+\begin{array}{|c|c||c|c|}
+\hline \mbox{字母} &\mbox{数量} & \mbox{字母} & \mbox{数量} \\
+\hline \text { A } & 13 & \text { N } & 11 \\
+\hline \text { B } & 18 & \text { O } & 17 \\
+\hline \text { C } & 12 & \text { P } & 21 \\
+\hline \text { D } & 15 & \text { Q } & 9 \\
+\hline \text { E } & 26 & \text { R } & 16 \\
+\hline \text { F } & 4 & \text { S } & 7 \\
+\hline \text { G } & 15 & \text { T } & 8 \\
+\hline \text { H } & 9 & \text { U } & 7 \\
+\hline \text { I } & 16 & \text { V } & 8 \\
+\hline \text { J } & 8 & \text { W } & 14 \\
+\hline \text { K } & 9 & \text { X } & 8 \\
+\hline \text { L } & 18 & \text { Y } & 20 \\
+\hline \text { M } & 22 & \text { Z } & 6 \\
+\hline
+\end{array}
+$$
+
+$$I = \frac{1}{n(n-1)} =  \sum_{i=0}^{25}n_i(n_i-1) = \frac{1}{337\times336}[13 \times 12 + 18 \times 17 + \cdots +6\times 5 = 0.0428$$
+$$k  = \frac{0.0265\times 337}{(0.065-0.0428)+337 \times (0.0428-0.0385)}  \approx6.2\approx6\quad\quad\quad\quad\quad \quad\quad\quad\quad\quad   \Box$$
+\section{卡西斯基检验}
+卡西斯基检验(Kasiski Test)是另一种维吉尼亚密码(Vigenère Cipher)中估算密钥长度的方法。它从密文中重复字母组之间的最大公约数(gcd)中获得可能的密钥长度。
+
+\textbf{例6}
+
+估算密文$I V E V Y G A R M L M Y I V E K F D I V E F R L$密钥长度
+
+解：
+
+$$ \underbrace{{\color{red}IVE}V Y G A R M L M Y }_{12}  \underbrace{{\color{red}IVE} K F D}_{6} \underbrace{{\color{red}IVE} FRL}_{6}$$
+$$k \approx gcd(12,6) = 6$$
+
+
+\section{密码分析}
+弗里德曼检验(Friedman Test)和卡西斯基检验(Kasiski Test)只能估计密钥长度，而不能直接猜出密钥本身。而且有一定局限性，通常少于400个字符时，检验的准确率不高。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+

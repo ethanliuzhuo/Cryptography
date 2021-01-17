@@ -1,0 +1,437 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+\usepackage{soul}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{破译矩阵换位}
+
+
+\author{
+Breaking Rectangular Transposition\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+\begin{document}
+\maketitle
+
+\section{条件概率}
+
+条件概率(Conditional Probability)是指事件A已经发生了，发生事件B的概率。
+
+$$\mathbb{P}(B|A) = \frac{\mathbb{P}(B \mbox{和} A)}{\mathbb{P}(A)}$$
+
+\textbf{例1}
+\begin{itemize}
+   \item 已知某病菌在人群中感染率约占5\%
+   \item 某机构研究出一种检测试剂，准确率可达到95\%
+   \item 假设某人使用该试剂，被检测出阳性，问实际感染率有多少？
+\end{itemize}
+
+解：
+
+假设人群有10000人，也就是500人受到了感染；9500人是健康的;
+\begin{itemize}
+\item 阳性：500人受感染的人群中，被检测出阳性的人数为$500 \times 0.95 = \color{red}{475}$人；被检测出阴性的人数为$500 \times 0.05 = 25$人；
+\item 阴性9500健康人群中，被检测出阳性概率为$9500 \times (1-0.95) =  \color{blue}{475}$人;被检测出阴性的人数为$9500 \times 0.95 = 9025$人；
+\end{itemize}
+
+
+$$\mathbb{P}( \mbox{真阳性} | \mbox{被检测出阳性} ) = \frac{ \mathbb{P}( \mbox{病人被确诊是真阳性)} }{ \mathbb{P}( \mbox{病人被检测出阳性} )}=\frac{ \color{red}{475}}{ \color{red}{475}+ \color{blue}{475}}=\frac{1}{2}$$\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad   \Box
+
+~\\
+
+\textbf{例2}
+
+\begin{enumerate}
+\item 给定一串密文，随机选择的字母，$\lambda$，是字母 $\color{red}{A}$的概率是多少？
+
+
+$$\mathbb{P}(\lambda = A) = \mathbb{P}(A) = 0.08399$$
+
+\item 假设我们已知$\lambda$左边的字母是$\mu$,并且知道字母$\lambda = \color{red}{A}$。即密文形式为$***\mu \lambda ***$。求$\mu = "\color{red}{Q}"$概率是多少。
+
+$$\mathbb{P}(\lambda = A | \mu = Q) = \frac{\mathbb{P}(\mu \lambda = QA)}{\mathbb{P}(\mu = Q)} = \frac{\mathbb{P}(\mbox{所有字母组合QA的总和})}{\mathbb{P}(\mbox{所有字母Q的总和})}$$
+
+\item 假设字母$\mu$和字母$\lambda$相距很远。 $\mu =\color{red}{L}$ 和$\lambda=\color{red}{A}$的概率是多少？
+$$\mathbb{P}(\lambda = A \and  \ \mu = Q) =\mathbb{P}(L)\mathbb{P}(A)$$
+\end{enumerate}
+
+\section{期望}
+
+在概率论和统计学中，一个离散性随机变量的期望值(mean)是试验中每次可能的结果乘以其结果概率的总和。
+
+$$\mathbb{E}(X) = x_1\mathbb{P}(X = x_1) + \cdots + x_k\mathbb{P}(X=x_k)$$
+
+\textbf{例3}
+
+掷出两个六面的色子，求两个正面的值的期望值。
+
+~\\
+解：
+
+$$
+\begin{array}{llllll}
+\hline
+(1,1)=2& (1,2)=3& (1,3)=4& (1,4)=5& (1,5)=6& (1,6)=7\\
+\hline
+(2,1)=3& (2,2)=4& (2,3)=5& (2,4)=6& (2,5)=7& (2,6)=8\\
+\hline
+(3,1)=4& (3,2)=5& (3,3)=6& (3,4)=7& (3,5)=8& (3,6)=9\\
+\hline
+(4,1)=5& (4,2)=6& (4,3)=7& (4,4)=8& (4,5)=9& (4,6)=10\\
+\hline
+(5,1)=6& (5,2=7)& (5,3)=8& (5,4)=9& (5,5)=10& (5,6)=11\\
+\hline
+(6,1)=7& (6,2)=8& (6,3)=9& (6,4)=10& (6,5)=11& (6,6)=12\\
+\hline
+\end{array}
+$$
+
+~\\
+
+$$
+\begin{array}{|l|l|l|l|l|l|}
+\hline
+\mbox{两面和}& 2&3&4&\cdots&12\\
+\hline
+\mbox{概率}& \frac{1}{36}&\frac{2}{36}&\frac{3}{36}&\cdots&\frac{1}{36}\\
+\hline
+\end{array}
+$$
+
+
+\section{凸函数}
+
+如果函数$y = f(x)$在区间$[a,b]$满足$f''(x) \ge 0,a \leq x \leq b$，以及$f'(x)$在该区间是递增的。那么该函数是凸函数(Convex Function)。
+
+\begin{figure}[H] %H为当前位置，!htb为忽略美学标准，htbp为浮动图形
+\centering %图片居中
+\includegraphics[width=0.7\textwidth]{图库/8.1.png} %插入图片，[]中设置图片大小，{}中是图片文件名
+\caption{凸函数} %最终文档中希望显示的图片标题
+\label{Fig.main2} %用于文内引用的标签
+\end{figure}
+
+\textit{\textbf{定理 1.} 让$x_1,x_2, \cdots,x_n \in [a,b]$，$p_1,p_2, \cdots ,p_n \in R$并满足$p_1+p_2+\cdots+p_n=1$。如果函数$f$是凸函数，并且：}
+
+
+$$f(p_1x_1+p_2x_2+\cdots+p_nx_n) \leq p_1f(x_1)+p_2f(x_2)+\cdots+p_nf(x_n)$$
+
+\textit{当且仅当$x_1=x_2=\cdots=x_n$时成立。}
+
+该定理为琴生不等式（Jensen's Inequality），证明过程在\href{https://www.math.cuhk.edu.hk/course_builder/1819/math3060/Elementary\%20Inequalities.pdf}{\color{blue}{这里}} 
+
+~\\
+
+让$f(x) = log(\frac{1}{x})$,则：
+$$log(\frac{1}{p_1x_1+p_2x_2+ \cdots +p_nx_n})\leq p_1log(\frac{1}{x_1})+ \cdots + p_nlog(\frac{1}{x_n})$$
+
+~\\
+
+\textit{\textbf{定理 2.} 让$p_1,p_2, \cdots ,p_n$是概率并满足$p_1+p_2+\cdots+p_n=1$。并且对于任意集合概率$q_1,q_2,\cdots,q_n$并满足$q_1+\cdots+q_n=1$,那么}
+$$\sum_{i=1}^{n}p_ilog(q_i) \leq \sum_{i=1}^{n}p_i log(p_i)$$
+
+证明：让$x_i = \frac{q_i}{p_i}$ ,并使用定理1.
+
+
+\section{破译过程}
+\begin{enumerate}
+\item 猜测解密排列长度，比如密钥长度k。
+\item 将密文排列为k列，N行的矩形。
+\item 对于$1\leq i \ne j \leq k$，提取i列和j列并计算字母对$\alpha \beta$的出现次数，并将其称为$\color{blue}{n^{ij}_{\alpha, \beta}}$
+\item 对于字母对$\alpha \beta$，让$\color{red}{\mathbb{P}_{\alpha, \beta}}$为在英文或者其他语种出现的概率，计算
+$$C_{i,j} = \sum_{\alpha \beta} \color{red}{\mathbb{P}_{\alpha, \beta}}log(\color{blue}{n^{ij}_{\alpha, \beta})}$$
+\end{enumerate}
+
+~\\
+
+\textbf{例4}
+
+$$k = 10,N =23,i =3,j=7$$
+
+密文排列为：23行，10列；
+
+$$
+\begin{array}{llllllllll}
+\hline
+E& C& T& I& H& N& O& H& G& I\\
+O& K& R& O& B& C& A& O& H& F \\
+E& I& N& S& G& N& N& S& A& A   \\
+E& T& C& N& I& I& E& C& N& H   \\
+O& A& S& R& E& E& H& C& T& L  \\
+H& S& A& A& T& E& I& B& N& E  \\
+S& F& N& E& U& C& N& O& E& R   \\
+R& E& T& I& U& S& S& S& A& A \\
+R& E& O& C& U& W& S& O& I& F \\
+M& N& D& A& O& D& I& D& V& A   \\
+T& E& C& H& E& X& O& T& T& E   \\
+H& O& F& E& T& C& E& R& L& A \\
+I& I& A& T& S& O& E& S& M& S \\
+M& S& T& E& I& O& N& K& W& N \\
+N& I& C& S& O& S& F& S& O& T \\
+X& Y& S& T& I& U& H& F& R& O \\
+A& R& E& G& X& S& A& A& E& M \\
+S& M& C& Y& H& L& Z& B& I& O\\
+B& A& E& Y& D& R& I& P& T& A \\
+L& R& C& A& U& R& N& A& A& R\\
+M& N& G& E& E& F& I& T& S& O \\
+T& A& X& R& S& H& A& I& T &G\\
+B& O& N& R& D& N& I& K& L& E\\
+\hline
+\end{array}
+$$
+
+解：
+
+~\\
+
+将$i=3$列，$j=7$列提出来，变成两列
+
+$$
+\begin{array}{lllllllllllllll}
+\hline
+E& C& \color{blue}{T}& I& H& N& \color{blue}{O}& H& G& I& &&& T& O\\
+O& K& \color{blue}{R}& O& B& C& \color{blue}{A}& O& H& F& &&& R& A\\
+E& I& \color{blue}{N}& S& G& N& \color{blue}{N}& S& A& A& &&& N& N\\
+E& T& \color{blue}{C}& N& I& I& \color{blue}{E}& C& N& H& &&& C& E\\
+O& A& \color{blue}{S}& R& E& E& \color{blue}{H}& C& T& L& &&& S& H\\
+H& S& \color{blue}{A}& A& T& E& \color{blue}{I}& B& N& E& &&& A& I\\
+S& F& \color{blue}{N}& E& U& C& \color{blue}{N}& O& E& R& &&& N& N\\
+R& E& \color{blue}{T}& I& U& S& \color{blue}{S}& S& A& A& &&& T& S\\
+R& E& \color{blue}{O}& C& U& W& \color{blue}{S}& O& I& F& &&& O& S\\
+M& N& \color{blue}{D}& A& O& D& \color{blue}{I}& D& V& A& &&& D& I\\
+T& E& \color{blue}{C}& H& E& X& \color{blue}{O}& T& T& E& &&& C& O\\
+H& O& \color{blue}{F}& E& T& C& \color{blue}{E}& R& L& A& &&& F& E\\
+I& I& \color{blue}{A}& T& S& O& \color{blue}{E}& S& M& S& &\Rightarrow	&& A& E\\
+M& S& \color{blue}{T}& E& I& O& \color{blue}{N}& K& W& N& &&& T& N\\
+N& I& \color{blue}{C}& S& O& S& \color{blue}{F}& S& O& T& &&& C& F\\
+X& Y& \color{blue}{S}& T& I& U& \color{blue}{H}& F& R& O& &&& S& H\\
+A& R& \color{blue}{E}& G& X& S& \color{blue}{A}& A& E& M& &&& E& A\\
+S& M& \color{blue}{C}& Y& H& L& \color{blue}{Z}& B& I& O& &&& C& Z\\
+B& A& \color{blue}{E}& Y& D& R& \color{blue}{I}& P& T& A& &&& E& I\\
+L& R& \color{blue}{C}& A& U& R& \color{blue}{N}& A& A& R& &&& C& N\\
+M& N& \color{blue}{G}& E& E& F& \color{blue}{I}& T& S& O& &&& G& I\\
+T& A& \color{blue}{X}& R& S& H& \color{blue}{A}& I& T &G& &&& X& A\\
+B& O& \color{blue}{N}& R& D& N& \color{blue}{I}& K& L& E& &&& N& I\\
+\hline
+\end{array}
+$$
+
+统计$TO,RA,NN,CE,\cdots ,NI$出现的次数，所以$n^{3,7}_{TO} = 1,n^{3,7}_{RA} = 1,n^{3,7}_{NN} = 2,\cdots,n^{3,7}_{NI} = 1$
+
+
+\begin{eqnarray}   
+\label{eq}
+C_{3,7} &=& \mathbb{P}_{TO}log(n^{3,7}_{TO}) + \mathbb{P}_{RA}log(n^{3,7}_{RA} ) + \cdots + \mathbb{P}_{NI}log(n^{3,7}_{NI}) \nonumber \\ 
+&=& \mathbb{P}_{TO}\cdot log(1) + \mathbb{P}_{RA}\cdot log(1) + \mathbb{P}_{NN}\cdot log(2)  \cdots + \mathbb{P}_{NI}\cdot log(1) \nonumber \\ 
+&=& \mathbb{P}_{TO} \cdot 0 + \mathbb{P}_{RA}\cdot 0 +\mathbb{P}_{NN} \cdot log(2) \cdots + \mathbb{P}_{NI} \cdot 0\nonumber \\ 
+\nonumber
+\end{eqnarray}
+
+然后计算所有的$C_{i,j}, i \ne j$
+$\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\Box$
+
+~\\
+
+定义$f_{\alpha, \beta}^{(i,h)}=\frac{n_{\alpha, \beta}^{(i,h)}}{N}$. 当i和j在明文中不是连续的,则：
+
+
+\begin{eqnarray}   
+C_{i j} &=&\sum_{\alpha, \beta} p_{\alpha \beta} \log \left(N \cdot f_{\alpha \beta}^{(i j)}\right) \nonumber \\
+&=&\log (N)+\sum_{\alpha, \beta} p_{\alpha \beta} \log \left(f_{\alpha \beta}^{(i j)}\right) \nonumber \\ 
+& \leq& \sum_{\alpha, \beta} p_{\alpha \beta} \log \left(p_{\alpha \beta}\right)\nonumber \\ 
+\end{eqnarray}
+
+当明文中两列i和j连续时$C_{ij}$非常得小。因此，如果我们猜测k是正确的，则矩阵$C_{ij},1 \leq i \ne j\leq k$除了第一行外，每一行的数量都大得多。
+
+\begin{itemize}
+\item •如果$C_{ij}$是第i行上的较大数字，则j在i后面跟随i
+解密排列。
+\item 如果第k行是唯一没有实质性条目的唯一行，则k是
+解密排列中的第一个条目。
+\end{itemize}
+
+~\\
+
+密钥空间有$26! \approx 2^{88}$
+
+\section{破译单字母替代}
+
+\textbf{例5}
+
+假设抛1000次色子，并记录每面朝上的值。能否确定是正确的？
+
+$$
+\begin{array}{|l|l|l|l|l|l|l|}
+\hline
+\mbox{结果}& 1&2&3&4&5&6\\
+\hline
+\mbox{频数}& 171&186&174&170&192&107\\
+\hline
+\end{array}
+$$
+
+使用卡方检验。
+
+\textit{卡方检验（Chi-Squared Test）是一种统计量的分布在零假设成立时近似服从卡方分布的假设检验。在没有其他的限定条件或说明时，卡方检验一般指代的是皮尔森卡方检验。}
+
+$$X^2=\sum_{i=1}^{k}\frac{(n_i-n\cdotp_i)^2}{n\cdot p_i}$$
+
+其中：
+
+\begin{itemize}
+\item $k$是指将会出现多少种结果
+\item $n_i$是被每个结果的频数
+\item $p_i$是每个结果的概率
+\item $n$ 是操作次数
+\end{itemize}
+
+在例5中，k=6,$n_i$是频数，$p_i=\frac{1}{6},n=1000$；
+$$
+\begin{aligned}
+X^{2} &=\sum_{i=1}^{6} \frac{\left(n_{i}-n \cdot p_{i}\right)^{2}}{n \cdot p_{i}} \\
+&=\frac{\left(171-1000 \times \frac{1}{6}\right)^{2}}{1000 \times \frac{1}{6}}+\frac{\left(186-1000 \times \frac{1}{6}\right)^{2}}{1000 \times \frac{1}{6}}+\ldots=27.95
+\end{aligned}
+$$
+
+对照\href{https://people.smp.uq.edu.au/YoniNazarathy/stat_models_B_course_spring_07/distributions/chisqtab.pdf}{\color{blue}{表格}},$X^2 \ge 27.95$ 是小于$0.001\%$的，即表示拒绝原假设，有99.999\%的把握说明这件事不可能发生！即这个表格可能是造假的。$\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\Box$
+
+~\\
+~\\
+
+\textbf{例6}
+
+已知是单字母替代算法，使用明文攻击。
+给定特定密文的字母频率如下:
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline\mbox{密文} &\mathrm{l}& \mathrm{h} & \mathrm{a} & \mathrm{w} & \mathrm{d} & \mathrm{q} & \mathrm{O} & \mathrm{n} & \mathrm{f} & \mathrm{s} & \mathrm{z} \\
+\hline \mbox{频数}& 80 & 61 & 55 & 46 & 44 & 40 & 39 & 35 & 33 & 26 & 22 \\
+\hline
+\end{array}
+$$
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline \mathrm{k} & \mathrm{p} & \mathrm{i} & \mathrm{t} & \mathrm{v} & \mathrm{y} & \mathrm{r} & \mathrm{x} & \mathrm{u} & \mathrm{m} & \mathrm{c} & \mathrm{g} & \mathrm{j} & \mathrm{b} & \mathrm{e} \\
+\hline 26 & 22 & 18 & 17 & 12 & 11 & 9 & 9 & 8 & 7 & 5 & 3 & 1 & 0 & 0 \\
+\hline
+\end{array}
+$$
+
+并且已经知道单词\textbf{$WHERE$}是明文，在密文中，找到两组字符串分别是\textbf{$\color{red}{HDFKF}$}和\textbf{$\color{blue}{PDLHL}$}与\textbf{$WHERE$}的结构一样。如何确定哪个字符串是与\textbf{$WHERE$}匹配？
+
+解：
+
+第一步，计算每个字母出现的概率；
+
+$$
+\begin{array}{|c|c||c|c|}
+\hline \text { Letter } & \text { Relative  frequency (\%) } & \text { Letter } & \text { Relative  frequency (\%) } \\
+\hline \text { A } & 8.399 & \text { N } & 6.778 \\
+\hline \text { B } & 1.442 & \text { O } & 7.493 \\
+\hline \text { C } & 2.527 & \text { P } & 1.991 \\
+\hline \text { D } & 4.800 & \text { Q } & 0.077 \\
+\hline \text { E } & 12.150 & \text { R } & 6.063 \\
+\hline \text { F } & 2.132 & \text { S } & 6.319 \\
+\hline \text { G } & 2.323 & \text { T } & 8.999 \\
+\hline \text { H } & 6.025 & \text { U } & 2.783 \\
+\hline \text { I } & 6.485 & \text { V } & 0.996 \\
+\hline \text { J } & 0.102 & \text { W } & 2.464 \\
+\hline \text { K } & 0.689 & \text { X } & 0.204 \\
+\hline \text { L } & 4.008 & \text { Y } & 2.157 \\
+\hline \text { M } & 2.566 & \text { Z } & 0.025 \\
+\hline
+\end{array}
+$$
+
+
+$$\mathbb{P}_W = \mathbb{P}(W|W\mbox{或}H\mbox{或}E\mbox{或}R)= \frac{0.02464}{0.02464+0.06025+0.1215+0.06063}=0.0923$$
+
+
+$$\mathbb{P}_H =0.226$$
+
+$$\mathbb{P}_E =0.455$$
+
+$$\mathbb{P}_R =0.227$$
+
+下一步计算\textbf{$\color{red}{HDFKF}$}的卡方检验结果。
+
+$$
+\begin{array}{c|c|c|c|c} 
+& W=H & H=D & E=F & R=K \\
+\hline P_{i} & 0.0923 & 0.226 & 0.455 & 0.227 \\
+\hline n_{i} & 61 & 44 & 33 & 26
+\end{array}
+$$
+
+n = 164,k=4,$n_i$是频数，$p_i$是每个字母出现的概率
+
+代入公式
+
+$$
+\begin{aligned}
+X^{2} &=\frac{(61-169 \cdot 0.0923)^{2}}{169.0 .0923}+\frac{(44-169 \cdot 0.226)^{2}}{169 \cdot 0.226} \\
+&+\frac{(33-169.0 .955)^{2}}{169.0 .455}+\frac{(26-169-0.227)}{169.0 .227} \\
+\approx & 181.88
+\end{aligned}
+$$
+
+~\\
+
+同理，计算\textbf{$\color{blue}{PDLHL}$}：
+
+$$
+X^{2} \approx 6.59
+$$
+
+~\\
+
+对照表格，取$X^2$值小的字符串作为假设正确。P值稍大，不拒绝原假设。即\textbf{$\color{blue}{PDLHL}$}正确。
+
+
+
+
+\end{document}
+
