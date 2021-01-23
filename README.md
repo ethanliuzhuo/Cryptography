@@ -27,6 +27,8 @@
 11.2. [RSA加密算法 RSA Part 2](https://github.com/ethanliuzhuo/Cryptography/blob/main/%E5%86%85%E5%AE%B9/11.1RSA%E5%B7%A5%E4%B8%9A%E7%BA%A7%E7%B4%A0%E6%95%B0.pdf)
 
 11.3. [RSA加密算法 RSA Part 3](https://github.com/ethanliuzhuo/Cryptography/blob/main/%E5%86%85%E5%AE%B9/11.2%E7%B4%A0%E6%95%B0%E6%B5%8B%E8%AF%95.pdf)
+12. [RSA加密算法 RSA Part 3](https://github.com/ethanliuzhuo/Cryptography/blob/main/%E5%86%85%E5%AE%B9/11.2%E7%B4%A0%E6%95%B0%E6%B5%8B%E8%AF%95.pdf)
+13. [RSA加密算法 RSA Part 3](https://github.com/ethanliuzhuo/Cryptography/blob/main/%E5%86%85%E5%AE%B9/11.2%E7%B4%A0%E6%95%B0%E6%B5%8B%E8%AF%95.pdf)
 
    
 持续更新
