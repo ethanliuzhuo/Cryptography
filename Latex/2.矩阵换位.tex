@@ -14,6 +14,19 @@
 \usepackage{float} %设置图片浮动位置的宏包
 \usepackage{subfigure} %插入多图时用子图显示的宏包
 \usepackage{listings}
+\usepackage{amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{\indent 定理}[section]
+\newtheorem{lemma}[theorem]{\indent 引理}
+\newtheorem{proposition}[theorem]{\indent 命题}
+\newtheorem{corollary}[theorem]{\indent 推论}
+\newtheorem{definition}{\indent 定义}[section]
+\newtheorem{example}{\indent 例}
+\newtheorem{remark}{\indent 注}[section]
+\newenvironment{solution}{\begin{proof}[\indent\bf 解]}{\end{proof}}
+\renewcommand{\proofname}{\indent\bf 证明}
+
 
 \geometry{a4paper,scale=0.8}
 \date{}
@@ -58,15 +71,14 @@ Rectangular Transposition\\
 
 普费尔密码(Playfair Cipher)由查尔斯·惠斯通(Charles Wheatstone)发明，里昂·普费尔（Lyon Playfair）推广, 因此得名普莱费尔密码。普费尔密码在第二次布尔战争和第一次世界大战中被英军广泛使用，之后的第二次世界大战中澳大利亚人也使用它。
 
-~\\
 
 \textbf{加密步骤}
 
 \subsection{确定密钥}
 
-~\\
 
-\textbf{例1}
+\begin{example}
+
 
 假设普费尔密码矩阵使用密钥（Keyword）: $DIVERGENT$
 
@@ -83,6 +95,9 @@ $$
 \end{array}
 $$ 
 
+\end{example}
+$\hfill\square$ 
+
 \subsection{将要加密的讯息分成两个一组}
 
 \begin{itemize}
@@ -92,13 +107,18 @@ $$
 
 ~\\
 
-\textbf{例2}
+\begin{example}
+
 
 明文$PLAN$, 则划分为$PL \| AN$ 
 
 明文$CHEEG$, 则划分为$CH \| EX \| EG$ 
 
-明文$ACT$, 则划分为$AC \| TQ$  \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box
+明文$ACT$, 则划分为$AC \| TQ$  
+
+\end{example}
+
+$\hfill\square$ 
 
 \subsection{加密}
 \begin{itemize}
@@ -109,7 +129,8 @@ $$
 
 ~\\
 
-\textbf{例3}
+\begin{example}
+
 
 根据例1表格：
 
@@ -167,6 +188,9 @@ $$
 
 一共拥有$25!$的密钥可能性。
 
+\end{example}
+
+$\hfill\square$ 
 
 \section{ADFGVX密码}
 ADFGVX密码由德国上校弗里茨·内贝尔(Fritz Nebel)发明。ADFGVX密码和Playfair密码相似，也是矩阵换位密码的一种。
@@ -183,7 +207,7 @@ ADFGVX密码由德国上校弗里茨·内贝尔(Fritz Nebel)发明。ADFGVX密�
 
 ~\\
 
-\textbf{例4}
+\begin{example}
 
 如密钥是SUMMER,则ADFGVX矩阵是：
 $$
@@ -199,12 +223,14 @@ $$
 \end{array}\\
 $$
 
+\end{example}
+$\hfill\square$ 
 
 ~\\
 
-\textbf{例5}
+\begin{example}
 
-使用列表\textbf{ $8\ 4\ 3\ 2\ 7\ 6\ 1\ 5$ }和如下表格加密\textit{$“from\ one\ day\ to\ another\ in\ battle"$}
+使用列表$\textbf{ [8\ 4\ 3\ 2\ 7\ 6\ 1\ 5] }$和如下表格加密\textit{$“from\ one\ day\ to\ another\ in\ battle"$}
 $$
 \begin{array}{|c|c|c|c|c|c|c|}
 \hline & \mathbf{A} & \mathbf{D} & \mathbf{F} & \mathbf{G} & \mathbf{V} & \mathbf{X} \\
@@ -218,7 +244,9 @@ $$
 \end{array}\\
 $$
 
-解：
+\begin{solution}
+
+
 
 将明文中的每个字母转换为其在ADFGVX中的坐标表
 
@@ -270,6 +298,8 @@ $$
 $$
 
 密文：{\color{blue}GAAVAVX} \quad {\color{red}FVGVADV} \quad DGDGDFA\quad DFXXXVX \quad  GXFXAXF \quad FAXFFXA \quad ADVADDD \quad DADDFGB 
+\end{solution}
+\end{example}
 
 \subsection{解密步骤}
 

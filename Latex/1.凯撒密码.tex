@@ -14,6 +14,19 @@
 \usepackage{float} %设置图片浮动位置的宏包
 \usepackage{subfigure} %插入多图时用子图显示的宏包
 \usepackage{listings}
+\usepackage{amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{\indent 定理}[section]
+\newtheorem{lemma}[theorem]{\indent 引理}
+\newtheorem{proposition}[theorem]{\indent 命题}
+\newtheorem{corollary}[theorem]{\indent 推论}
+\newtheorem{definition}{\indent 定义}[section]
+\newtheorem{example}{\indent 例}
+\newtheorem{remark}{\indent 注}[section]
+\newenvironment{solution}{\begin{proof}[\indent\bf 解]}{\end{proof}}
+\renewcommand{\proofname}{\indent\bf 证明}
+
 
 \geometry{a4paper,scale=0.8}
 \date{}
@@ -69,7 +82,7 @@ The Caesar Cipher\\
 
 首先需要设置偏移量：
 
-\textbf{例1}
+\begin{example}
 
 当偏移量为16时，得到如下加密方法。所有的字母\textbf{A}向拉丁字母表右移动16位，将被替换成字母\textbf{Q}，字母\textbf{B}向字母表右移动16位变成字母\textbf{R}，以此列推。
 
@@ -86,20 +99,25 @@ $$
 \end{array}
 $$
 
-如明文：Person。加密后可以得到：FUHIED。\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box
+\begin{solution}
 
-~\\
+如明文：Person。加密后可以得到：FUHIED。
+
+\end{solution}
+\end{example}
+
 
 由此我们可以知道，密钥空间$|K| = $密钥数量$ = 26$。
 
 或者$|K| = 25$，当偏移量为26时，字母A替换成字母A这种情况不算。
 
-~\\
 
-\textbf{例2}
+\begin{example}
 
 使用$Python$程序加密I am a person.
 
+
+\begin{solution}
 \begin{lstlisting}
 Plaintext = 'iamaperson'
 ciphertext = ''
@@ -115,8 +133,12 @@ for i in Plaintext:
 print(ciphertext)
 \end{lstlisting}
 
-输出：meqetivwsr \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box
+输出：meqetivwsr 
 
+
+\end{solution}
+
+\end{example}
  
 
 作为明文时一般没有空格，大小写也不区分。
@@ -126,10 +148,9 @@ print(ciphertext)
 由于\textbf{拉丁字母表}中的字母有且仅有26个，使得凯撒密码易受频率分析和暴力破解的攻击。
 最多26种可能性即可破解。
 
-\textbf{例3}
-
+\begin{example}
 破解密文：exxegoexsrgi
-
+\begin{solution}
 ~\\
 
 使用$Python$程序破解：
@@ -165,7 +186,11 @@ $$
 \end{array}
 $$
 
-由此可知，解密后明文为attack at once\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box
+由此可知，解密后明文为attack at once
+
+\end{solution}
+\end{example}
+
 
 \section{凯撒密码的改进}
 是否觉得凯撒密码太过于简单被破解？我们有三种方法可以使得密文更难破解：
@@ -212,19 +237,20 @@ $$
 \label{Fig.main2} %用于文内引用的标签
 \end{figure}
 
-\textbf{例4}
+\begin{example}
 
-密文$\Diamond\Box \Box \Delta $既可以是$FOOD$也可以是 $AMMO$。 $\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box$
+密文$\Diamond\Box \Box \Delta $既可以是$FOOD$也可以是 $AMMO$。 $\hfill\square$ 
 
-~\\
+\end{example}
 
-\textbf{例5}
+\begin{example}
 
-明文$OK$既可以是 "$83$" 也可以是 "$[3$"。 $\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box$
-~\\
+明文$OK$既可以是 “$83$” 也可以是 “$[3$”。 $\hfill\square$ 
+
+\end{example}
 
 相比随机替换，不容易被频率分析破解。
-~\\
+
 
 \clearpage
 
@@ -234,7 +260,7 @@ $$
 
 ~\\
 
-\textbf{例6}
+\begin{example}
 
 $$
 \begin{aligned}
@@ -259,6 +285,7 @@ $$
 
 其中，密钥(Key)为${\color{red}REV}$
 
+
 对明文${\color{red}Avenged\ Sevenfold}$进行加密：
 
 $$
@@ -274,8 +301,12 @@ $$
 \end{aligned}
 $$
 
-得到密文$RZZEKZUWZMIIWSGU$ $\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Box$
+得到密文$RZZEKZUWZMIIWSGU$
 
+\end{example}
+
+$\hfill\square$ 
+ 
 ~\\
 
 多字母替代的密钥空间等于26的密钥长度次方。如果Key = WATER， 则密钥空间为$26^{5}$。

@@ -1,0 +1,570 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+\usepackage{amsthm}
+\usepackage{tikz}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{\indent 定理}[section]
+\newtheorem{lemma}[theorem]{\indent 引理}
+\newtheorem{proposition}[theorem]{\indent 命题}
+\newtheorem{corollary}[theorem]{\indent 推论}
+\newtheorem{definition}{\indent 定义}
+\newtheorem{example}{\indent 例}
+\newtheorem{remark}{\indent 注}
+\newenvironment{solution}{\begin{proof}[\indent\bf 解]}{\end{proof}}
+\renewcommand{\proofname}{\indent\bf 证明}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{pgfplots}
+\usetikzlibrary{calc}
+\pgfplotsset{compat=1.12}
+    
+\pgfplotsset{
+    compat=1.12,
+}
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{格子密码}
+
+
+\author{
+Lattice-based Cryptography\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+
+\begin{document}
+\maketitle
+
+格子密码是在结构本身或在安全证明中涉及格(Lattice)的加密图元构造的通用术语。基于晶格的构造目前是后量子密码学的重要候选者。
+
+\section{格}
+
+\begin{definition}
+让$\mathbf{v_1,v_2,\cdots,v_n}$是在$n$维欧几里得空间（Euclidean space）$R^n$中的独立向量(independent vectors)。格(lattice)记作$L$，它是由$\{\mathbf{v_1,v_2,\cdots,v_n}\}$的线性组合的集合，$\mathbf{v_1,v_2,\cdots,v_n}$的系数为整数：
+$$L = \{a_1\mathbf{v_1}+a_2\mathbf{v_2}+\cdots +a_n\mathbf{v_n},\mathbf{a_i} \in \mathbb{Z}\}$$
+\end{definition}
+
+备注:$L$的基是生成$L$的n个独立向量的任意集合。格子有无穷多个基。
+
+\begin{definition}
+设$L$是维数为$n$的格，\mathbb{B} = $\{\mathbf{v_1,v_2,\cdots,v_n}\}$是$L$的一个基。$L$的基本域(或基本平行六面体)对应于这个基$B$是集合：
+$$\mathbb{F}(\mathbf{v_1,v_2,\cdots,v_n}) = \{t_1\mathbf{v_1}+t_2\mathbf{v_2}+\cdots +t_n\mathbf{v_n}, 0 \leq t_i  < 1\}$$
+\end{definition}
+
+\begin{lemma}
+设$L \subset \mathbb{R^n} $是$n$维的格，\mathbb{F}是$L$的一个基本域。则每一个向量$\mathbf{w} \in \mathbb{R^n}$可以写作:
+$$\mathbf{w = t + v}$$
+有唯一的$\mathbf{t} \in \mathbb{F}$和有唯一的$\mathbf{v} \in L$。
+\end{lemma}
+
+$$
+    \begin{tikzpicture}[
+        % define the style `point' which is used for the nodes on the coordinates
+        point/.style={
+            circle,
+            fill=blue,
+            inner sep=1.5pt,
+        },
+    ]
+        \begin{axis}[
+            xmin=-4,
+            xmax=7,
+            ymin=-7,
+            ymax=7,
+            xlabel={$x$},
+            ylabel={$y$},
+            scale only axis,
+            axis lines=middle,
+            domain=-1.912931:3,
+            samples=200,
+            smooth,
+            clip=false,
+            % use same unit vectors on the axis
+            axis equal image=true,
+        ]
+
+            % add nodes to the points and the corresponding labels
+            \node [point,label={{\color{red}}}]
+                (P0) at (0,0)  {{\color{red}}};
+                
+            \node [point,label={}]
+                (P1) at (-4,-1)  {};
+            \node [point,label={}]
+                (P2) at (-2,-1)  {};
+            \node [point,label={}]
+                (P3) at (0,-1)  {};
+             \node [point,label={}]
+                (P4) at (2,-1)  {};
+             \node [point,label={}]
+                (P5) at (4,-1)  {}；
+            \node [point,label={}]
+                (P6) at (-3,0)  {};
+            \node [point,label={}]
+                (P7) at (-1,0) {};
+            \node [point,label={}]
+                (P8) at (1,0)  {};
+            \node [point,label={}]
+                (P30) at (3,0)  {};
+            \node [point,label={}]
+                (P10) at (5,0)  {};
+            \node [point,label={}]
+                (P11) at (-2,1) {};
+            \node [point,label={}]
+                (P12) at (0,1)  {};
+             \node [point,label={}]
+                (P21) at (2,1)  {};
+             \node [point,label={}]
+                (P14) at (4,1)  {}；
+            \node [point,label={}]
+                (P15) at (6,1) {};
+            
+            \node [point,label={}]
+                (P7) at (-1,2) {};
+            \node [point,label={}]
+                (P8) at (1,2)  {};
+            \node [point,label={}]
+                (P32) at (3,2)  {};
+            \node [point,label={}]
+                (P10) at (5,2)  {};
+            \node [point,label={}]
+                (P6) at (7,2)  {};
+                
+           
+            \node [point,label={}]
+                (P12) at (0,3)  {};
+             \node [point,label={}]
+                (P13) at (2,3)  {};
+             \node [point,label={}]
+                (P14) at (4,3)  {}；
+            \node [point,label={}]
+                (P15) at (6,3) {};
+             \node [point,label={}]
+                (P11) at (8,3) {};
+
+
+            % draw a line from (P0) a bit further than just to (P3)
+            \draw [red,->] (P0) -- node[red,below]  {$v_1$} (P30);
+            \draw [red,->] (P0) -- node[red,above]  {$v_2$} (P32);
+        \end{axis}
+    \end{tikzpicture}
+$$
+
+
+\textbf{寻找格规约算法}(An algorithm for finding reduced basis):
+\begin{enumerate}
+\item while $\left\|\mathbf{b}_{\mathbf{1}}\right\|>\left\|\mathbf{b}_{\mathbf{2}}\right\|$
+\item  \quad\quad\quad $\operatorname{swap} \mathbf{b}_{1}, \mathbf{b}_{2}$
+\item \quad\quad\quad$u:=\left[\frac{b_{1} \cdot b_{2}}{b_{1} \cdot b_{1}}\right]$($[u]$取最接近的整数)
+\item \quad\quad\quad if $u=0$ then return $\left(\mathbf{b}_{1}, \mathbf{b}_{2}\right)$ 
+\item \quad\quad\quad else $\mathbf{b}_{2}:=\mathbf{b}_{2}-u \cdot \mathbf{b}_{1}$
+\end{enumerate}
+
+~\\
+
+\begin{example}
+$\mathbf{b}_{1} = (90,123), \mathbf{b}_{2} = (56,76)$
+
+寻找格规约(reduced basis)
+
+\begin{solution}
+
+\textbf{第一步：}
+$$
+\begin{array}{l}
+\left\|b_{1}\right\| =  3 \sqrt{2581} \\
+\left\|b_{2}\right\|=4 \sqrt{557}
+\end{array} 
+\left\|b_{1}\right\|>\left\|b_{2}\right\|
+$$
+
+交换$\mathbf{b}_{1},\mathbf{b}_{2}$, $\mathbf{b}_{1} = (56,76), \mathbf{b}_{2} = (90,123)$
+
+$$u:=\left[\frac{b_{1} \cdot b_{2}}{b_{1} \cdot b_{1}}\right] = \left[\frac{56 \cdot 90 + 76 \cdot 123}{56^2 + 76^2}\right] = \left[\frac{3597}{2228}\right] = 2 \ne 0$$
+
+$$
+\mathbf{b}_{2}=(90,123)-2(56,-76)=(-22,-29)
+$$
+
+\textbf{第二步：}
+
+$\mathbf{b}_{1} = (56,76) , \mathbf{b}_{2} =(-22,-29)$
+
+$$
+\begin{array}{l}
+\left\|b_{1}\right\|= 4 \sqrt{557}\\
+\left\|b_{2}\right\|=5 \sqrt{53}
+\end{array} 
+\left\|b_{1}\right\|>\left\|b_{2}\right\|
+$$
+
+交换$\mathbf{b}_{1},\mathbf{b}_{2}$,$\mathbf{b}_{1} =  (-22,-29), \mathbf{b}_{2} = (56,76)$
+
+$$u:=\left[\frac{b_{1} \cdot b_{2}}{b_{1} \cdot b_{1}}\right] = \left[\frac{(-22) \cdot 56 + (-29) \cdot 76}{(-22)^2 + (-29)^2}\right] = \left[-\frac{3436}{1325}\right] = -3 \ne 0$$
+
+$$
+\mathbf{b}_{2}=\mathbf{b}_{2} + 3\mathbf{b}_{1} = (-10,-11)
+$$
+
+\textbf{第三步：}
+
+$\mathbf{b}_{1} = (-22,-29), \mathbf{b}_{2} =(-10,-11)$
+
+$$
+\begin{array}{l}
+\left\|b_{1}\right\|= 5 \sqrt{53}\\
+\left\|b_{2}\right\|= \sqrt{221}
+\end{array} 
+\left\|b_{1}\right\|>\left\|b_{2}\right\|
+$$
+
+交换$\mathbf{b}_{1},\mathbf{b}_{2}$,$\mathbf{b}_{1} =  (-10,-11), \mathbf{b}_{2} = (-22,-29)$
+
+$$u:=\left[\frac{b_{1} \cdot b_{2}}{b_{1} \cdot b_{1}}\right] = \left[\frac{539}{221}\right] = 2 \ne 0$$
+
+$$
+\mathbf{b}_{2}=\mathbf{b}_{2} - 2\mathbf{b}_{1} = (-2,-7)
+$$
+
+\textbf{第四步：}
+
+$\mathbf{b}_{1} = (-10,-11), \mathbf{b}_{2} =(-2,-7)$
+
+$$
+\begin{array}{l}
+\left\|b_{1}\right\|= \sqrt{221}\\
+\left\|b_{2}\right\|= \sqrt{53}
+\end{array} 
+\left\|b_{1}\right\|>\left\|b_{2}\right\|
+$$
+
+交换$\mathbf{b}_{1},\mathbf{b}_{2}$,$\mathbf{b}_{1} =  (-2,-7), \mathbf{b}_{2} = (-10,-11)$
+
+$$u:=\left[\frac{b_{1} \cdot b_{2}}{b_{1} \cdot b_{1}}\right] = \left[-\frac{97}{53}\right] = 1.8 = 2 \ne 0$$
+
+$$
+\mathbf{b}_{2}=\mathbf{b}_{2} - 2\mathbf{b}_{1} = (-6,3)
+$$
+
+\textbf{第五步：}
+
+$\mathbf{b}_{1} = (-2,-7), \mathbf{b}_{2} =(-6,3)$
+
+$$
+\begin{array}{l}
+\left\|b_{1}\right\|= \sqrt{53}\\
+\left\|b_{2}\right\|= \sqrt{39}
+\end{array} 
+\left\|b_{1}\right\|>\left\|b_{2}\right\|
+$$
+
+交换$\mathbf{b}_{1},\mathbf{b}_{2}$,$\mathbf{b}_{1} =  (-6,3), \mathbf{b}_{2} = (-2,-7)$
+
+$$u:=\left[\frac{b_{1} \cdot b_{2}}{b_{1} \cdot b_{1}}\right] = \left[\frac{-9}{39}\right]  =  0$$
+
+
+结束，返回$\mathbf{b}_{1} =  (-6,3), \mathbf{b}_{2} = (-2,-7)$
+
+
+\end{solution}
+\end{example}
+
+
+
+\section{最短向量问题}
+最短向量问题(The Shortest Vector Problem,SVP)是指在格$L$中找到一个最短的非零向量，即找到一个非零向量 $v \in L$，使欧几里得范数$||\mathbf{v}|| = \sqrt{v_1^2 + v_2^2 + \cdots + v_n^2}$最小。
+
+最近向量问题(The Closest Vector Problem ,CVP)是一个向量$\mathbf{w \in \mathbb{R}}$ 不在$L$中，然后找到一个向量$\mathbf{v \in L}$ 与$\mathbf{w}$最接近。他们之间的欧氏距离范数为$||\mathbf{w-v}||$。
+
+SVP和CVP都是深奥的问题，随着格的维度的增加，这两个问题的计算都变得越来越困难。另一方面，SVP和CVP的近似解在纯数学和应用数学的不同领域都有令人惊讶的应用。
+
+如果维数n很大，例如$n > 100 $ 那么已知的算法在求解SVP时并不是很有效，但$CVP$问题却很容易。这允许在密码结构中使用格，几种基于格的密码系统已经被提出。
+
+\section{Goldreich, Goldwasser和Halevi (GGH)公钥密码系统}
+\begin{enumerate}
+\item ${\color{blue}Alice}$ 在整数域选择一个基(basis) $\mathbf{v = \{v_1,v_2,\cdots,v_n\}}$。设$\mathbf{V}$是矩阵它的行是向量$v_i$，$L$是向量$v_i$生成的格；
+\item ${\color{blue}Alice}$ 选择一个$n \times n$的矩阵$U$,$U$都是整数项，并且$det(U) = \pm 1$。计算$W = UV$。然后公开$W$的行向量$\mathbf{w_i}$；
+\item 假设${\color{red}Bob}$想要发送信息$\mathbf{m} = (m_1,_2,\cdots,m_n)$，将$\mathbf{m}$转化为一个整数域的向量。然后随机选择一个小向量$\mathbf{r}$，计算$$\mathbf{e} = m_1\mathbf{w_1} +  m_2\mathbf{w_2} + \cdots +  m_n\mathbf{w_n} + \mathbf{r}$$
+将$ \mathbf{e}$发送给${\color{blue}Alice}$ ；
+\item ${\color{blue}Alice}$ 解决最近向量问题(CVP)，找到一个向量$\mathbf{d} \in L$与$\mathbf{e}$最接近。然后计算
+
+$$
+\mathbf{d} \cdot W^{-1}=\left(m \cdot W+r\right) W^{-1}=m \cdot U \cdot W \cdot W^{-1}+r \cdot W^{-1}=m \cdot U+r \cdot W^{-1}
+$$
+
+$\mathbf{m} = \mathbf{m} \cdot U \cdot U^{-1}$；
+\end{enumerate}
+
+~\\
+
+\begin{example}
+令$$
+V= \begin{pmatrix}
+11 & 0 \\
+0 & 7
+\end{pmatrix}
+ \quad\quad
+U=\begin{pmatrix}
+7 & 5 \\
+4 & 3
+\end{pmatrix}
+$$
+
+使用$\mathbf{r} = (1,1)$加密信息$\mathbf{m} = (12,13)$
+
+\begin{solution}
+
+验证$det(U) = 7 \cdot 3 - 4 \cdot 5 = 1$满足条件，可以使用
+
+$$
+V^{-1}=\begin{pmatrix}
+\frac{1}{11} & 0 \\
+0 & \frac{1}{7}
+\end{pmatrix}
+\quad\quad
+U^{-1}=\begin{pmatrix}
+3 & -5 \\
+-4 & 7
+\end{pmatrix}
+$$
+
+$$W = UV = \begin{pmatrix}
+7 & 5 \\
+4 & 3
+\end{pmatrix}\begin{pmatrix}
+11 & 0 \\
+0 & 7
+\end{pmatrix} = \begin{pmatrix}
+77 & 35 \\
+44 & 21
+\end{pmatrix}  
+$$
+
+$$\mathbf{e} = \mathbf{m}W + \mathbf{r} = (1497       ,694)$$
+
+${\color{blue}Alice}$收到$\mathbf{e}$后进行解密：
+
+$$\mathbf{e} V^{-1} = (1497,694) \begin{pmatrix}
+\frac{1}{11} & 0 \\
+0 & \frac{1}{7}
+\end{pmatrix} = \left(
+\frac{1497}{11},  \frac{694}{7} \right) \approx (136,99)$$
+
+
+$$ \mathbf{m} = (136,99)U^{-1} =  (136,99)\begin{pmatrix}
+3 & -5 \\
+-4 & 7
+\end{pmatrix}= (12,13)$$
+
+
+
+\end{solution}
+
+\end{example}
+
+
+
+~\\
+$\mathbf{NTRU}$公钥密码系统是由Hoffstein, Pipher和 Silverman发明。由一种多项式的卷积所构成。
+
+多项式卷积算法是$$f * g = \sum_{k=0}^{N-1}c_kx^k$$ 其中 $$c_k = \sum_{i+j \equiv k \pmod{N}} f_ig$$
+
+~\\
+
+\begin{example}
+计算当$N = 3$时，$f * g$,其中 
+
+$$
+f= \sum_{i=0}^{N-1} f_{i} x^{i}=x^{2}+4 x-1 
+$$
+$$
+g =\sum_{i=0}^{N-1} g_{i} x^{i}=5 x^{2}-x+3 
+$$
+
+~\\
+
+\begin{solution}
+
+$f$的多项式为$f = [f_0,f_1,f_2] = [-1,4,1]$
+
+$g$的多项式为$g = [g_0,g_1,g_2] = [3,-1,5]$
+
+$c = f * g$的多项式是
+
+$$
+\left[\begin{array}{c}
+c_{0} \\
+c_{1} \\
+c_{2}
+\end{array}\right]=\left[\begin{array}{ccc}
+f_{0} & f_{2} & f_{1} \\
+f_{1} & f_{0} & f_{2} \\
+f_{2} & f_{1} & f_{0}
+\end{array}\right]\left[\begin{array}{c}
+g_{0} \\
+g_{1} \\
+g_{2}
+\end{array}\right]=\left[\begin{array}{ccc}
+-1 & 1 & 4 \\
+4 & -1 & 1 \\
+1 & 4 & -1
+\end{array}\right]\left[\begin{array}{c}
+3 \\
+-1 \\
+5
+\end{array}\right]=\left[\begin{array}{c}
+16 \\
+18 \\
+-6
+\end{array}\right]
+$$
+
+$$f * g = 16+18x -6x^2$$
+
+因此通常情况$f * g$通项是：
+
+$$
+\left[\begin{array}{c}
+c_{0} \\
+c_{1} \\
+\vdots \\
+c_{N-1}
+\end{array}\right]=\left[\begin{array}{ccccc}
+f_{0} & f_{N-1} & f_{N-2}  &  \cdots &   f_{1}   \\
+f_{1} & f_{0} & f_{N-1}  &  \cdots &   f_{2}  \\
+\vdots & \vdots& \vdots  &  \ddots &   \vdots  \\
+f_{N-1} & f_{N-2} & f_{N-3} &  \cdots &  f_{0} \\ 
+\end{array}\right]\left[\begin{array}{c}
+g_{0} \\
+g_{1} \\
+\vdots \\
+g_{N-1}
+\end{array}\right]=\left[\begin{array}{c}
+p_{0} \\
+p_{1} \\
+\vdots \\
+p_{N-1}
+\end{array}\right]
+$$
+\end{solution}
+\end{example}
+
+\subsection{NTRU}
+NTRU是一种非对称密码系统，它基于格上的最短向量问题。1996年由Hoffstein, piphher和Silverman发现。2009年，NTRU密码系统已经通过了电气和电子工程师协会(IEEE)的标准化认证。与RSA和ECC相比，这是一种更有效的加密和解密方法:更快的密钥生成(使用一次性密钥)和低内存使用(因此它可以用于移动设备和智能卡)。
+
+NTRU的消息为多项式形式，其系数为整数mod $p$。
+
+~\\
+
+${\color{blue}Alice}$作为发送者以及${\color{red}Bob}$接受者想使用NTRU，那么他们该如何使用呢？ 
+\begin{enumerate}
+\item ${\color{blue}Alice}$和${\color{red}Bob}$共同决定一个指数$N$，使得多项式的次数最多为$N-1$，系数为整数。以及再共同决定两个整数$p,q$，使得$gcd(p,q) = 1$;
+\item ${\color{red}Bob}$选择两个多项式
+$$f = \sum_{k = 0}^{N-1}f_ix^i$$
+$$g = \sum_{k = 0}^{N-1}g_ix^i$$
+然后计算 $f_p := f^{-1} \pmod{ p}$和 $f_q := f^{-1} \pmod{ q}$，保留$f_p ,f_q$；
+\item ${\color{red}Bob}$计算$h = f_q * g \pmod{q}$，并公开；
+\item ${\color{blue}Alice}$把信息转换成一个多项式$m$,其系数是整数介于$-p/2$和$p/2$ mod $p$之间；
+\item 然后${\color{blue}Alice}$随机选择另一个小的多项式$r$(以掩盖信息)。保留$r$不公开，然后将$e = pr * h + m \pmod{q}$发送给${\color{red}Bob}$；
+\item ${\color{red}Bob}$ 为了还原信息，他需要计算$a = f * e \pmod{q}$和$b = a \pmod{p}$;
+\item 最后，${\color{red}Bob}$计算$f_p * b \pmod{p}$还原信息；
+\end{enumerate}
+
+注意$f *f_p = 1 \pmod{p},f *f_q = 1 \pmod{q}, h = f_q * g \pmod{q}$
+
+$$a = f * e = f * (pr * h + m) = pr * (f * h) + f*m = pr*g + f*m \pmod{q}$$
+
+$$b = a \pmod{p} = pr * g + f * m \pmod{p} = f * m \pmod{p} $$
+因此，
+$$f_p * b = f_p *f * m = m \pmod{p} $$
+还原成功。
+
+
+\begin{example}密钥生成
+${\color{blue}Alice}$和${\color{red}Bob}$ 共同决定了$N = 7,p = 3, q = 41,d = 2$。
+\begin{enumerate}
+\item ${\color{red}Bob}$选择了两个多项式：
+$$f(x) = x^6−x^4+x^3+x^2−1 $$
+$$g(x) = x^6+x^4−x^2−x$$
+\item $$Fq(x) = f (x)^ {−1} \pmod{q} = 8x^6 + 26x^5 + 31x^4
++ 21x^3 + 40x^2 + 2x + 37 \pmod{41}$$
+$$Fp(x) = f (x)^ −1 \pmod{p} = x^6 + 2x^5 + x^3 + x^2 +
+x + 1  \pmod{3}$$ 保留为私钥；
+\item $$h(x) = p * (Fq )*g \pmod{q} = 20x^6 + 40x^5 + 2x^4
++ 38x^3 + 8x^2 + 26x + 30 \pmod{41} $$ 并公开；
+\item 假设${\color{blue}Alice}$ 把信息转化为 $m(x) = −x^5 +x^3 +x^2 − x + 1$ 并用$r(x) x^6 − x^5 + x −
+1$进行加密
+$$e(x)≡ 31x^6+19x^5+4x^4+2x^3+40x^2+3x+25 \pmod{41}$$
+\item ${\color{red}Bob}$计算$$a = f * e \pmod{q} =  x^6 + 10x^5 + 33x^4 + 40x^3 + 40x^2 + x + 40 \pmod{41}$$
+$$b = a \pmod{p} =x^6 + 10x^5 −8x^4 − x^3 − x^2 + x − 1  \pmod{3} $$
+\item ${\color{red}Bob}$计算$f_p * b \pmod{p} = 2x^5 + x^3 + x^2 + 2x + 1 \pmod{3}  = {\color{red}m(x)} =−x^5 +x^3 +x^2 − x + 1$ ，还原成功
+\end{enumerate}
+
+\end{example}
+
+$\hfill\square$ 
+
+~\\
+
+当$N = 503,p = 3, q = 256$，就拥有非常高的安全性了。
+
+\section{Zero Knowledge Protocol}
+
+假设有一个双面隧道，隧道两边有一扇门。
+${\color{blue}Alice}$想向${\color{red}Bob}$证明她能开门。然而，她不想让${\color{red}Bob}$知道她是怎么做到的。该如何做呢？
+
+\begin{enumerate}
+\item ${\color{red}Bob}$秘密地随机选择k个命令序列，“对”、“错”、“左”、“右”之类的；
+\item ${\color{blue}Alice}$进入隧道(${\color{red}Bob}$没有看到她从哪边进入)，并站在门中等待${\color{red}Bob}$的命令；
+\item ${\color{red}Bob}$发出命令，并观察${\color{blue}Alice}$离开隧道的一侧；
+\item 如果${\color{blue}Alice}$每次都能从正确的一边出来，那么${\color{red}Bob}$就接受她可以打开门。
+\end{enumerate}
+
+\end{document}
+
+%https://en.wikipedia.org/wiki/Lattice-based_cryptography
+%http://people.scs.carleton.ca/~maheshwa/courses/4109/Seminar11/NTRU_presentation.pdf
+%http://www.math.ucsd.edu/~qtbach/187/Day%2023A.pdf

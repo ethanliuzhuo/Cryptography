@@ -1,0 +1,371 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{amssymb}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+\usepackage{soul}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes.geometric}
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{ElGamal 密码}
+
+
+\author{
+El Gamal Cryptosystem\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+
+\begin{document}
+\maketitle
+
+在密码学中，ElGamal加密算法是一个基于迪菲-赫尔曼密钥交换的非对称加密算法。它在1985年由塔希尔·盖莫尔提出。GnuPG和PGP等很多密码学系统中都应用到了ElGamal算法。
+
+ElGamal加密算法可以定义在任何循环群$G$上。它的安全性取决于$G$上的离散对数难题。
+
+\section{离散对数问题}
+有一个素数$p$和一个整数$\alpha$,$\alpha$不能被$p$整除。那么如果给一个整数$\beta$，则：
+
+$$\alpha^x \equiv \beta \pmod{p}$$。
+
+即代表$x$有多组解。因为$3^x = 11 \Leftrightarrow	 x = log_3(11)$,但$3^x = 11 \pmod{18}$就代表有很多解。
+
+\textit{\textbf{定义1：}如果对于所有的$i$满足$a^i \equiv 1\pmod{p}$，那么将$a$称之为{\color{red}primitive root mod}}
+
+~\\
+
+\textit{\textbf{定理1：}如果$a$是{\color{red}primitive root mod p}}，则$a^1,a^2,\cdots ,a^{p-1} \pmod{p}$
+~\\
+
+\textbf{莫比斯公式：}
+$$
+\begin{aligned}
+&\mu(d)=\left\{\begin{array}{ll}
+(-1)^{k} & \mbox{如果d是k个不同质数的乘积} \\
+0 & \mbox{其他} 
+\end{array}\right.\\
+\end{aligned}
+$$
+
+\textit{\textbf{定义2：}分圆多项式 (Cyclotomic polynomial)}:
+$$
+C_{n}(x)=\prod_{m \mid n}\left(1-x^{m}\right)^{\mu\left(\frac{n}{m}\right)}
+$$
+~\\
+
+
+
+\textit{\textbf{定理2：}对于每一个素数$p$，$a$是{\color{red}primitive root mod p} 当且仅当$C_{p-1}(a) \equiv 0 \pmod{p}$ }
+
+~\\
+
+\textbf{例1：}
+
+$p = 11$
+
+$$C_{p-1}(2) = C_{10}(2) = 2^4- 2^3 +2^2-2^1+2^0 \pmod{11} \equiv 11 \pmod{11} \equiv 0 \pmod{11}$$
+
+$$C_{p-1}(3) = C_{10}(3) = 3^4- 3^3 +3^2-3^1+3^0 \pmod{11} \equiv 61 \pmod{11} \not\equiv 0 \pmod{11}$$
+
+
+因此2是一个{\color{red}primitive root mod 11}，3不是一个{\color{red}primitive root mod 11}。
+
+$\hfill\square$ 
+
+
+\textbf{例2：}
+
+
+$C_{18}(x), n = 18$
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|}
+\hline 
+m & 1 & 2& 3 &6&9&18 \\
+\hline 
+\frac{18}{m} &18&9&6&3&2&1  \\
+\hline 
+\mu\left(\frac{18}{m} \right) &0&0&{\color{red}1}&{\color{blue}-1}&{\color{blue}-1}&{\color{red}1} \\
+\hline
+\end{array}
+$$
+
+$$C_{18}(x) =\frac{(1-x^{{\color{red}18}})(1-x^{{\color{red}3}})}{(1-x^{{\color{blue}9}})(1-x^{{\color{blue}6}})} = \frac{(1+x^{9})}{(1+x^3)} =\frac{(1+x^{3})(1-x^{3}+x^{6})}{(1+x^3)}  = 1 - x^3+x^6$$
+
+~\\
+
+$C_{10}(x), n = 10$
+
+$$
+\begin{array}{|c|c|c|c|c|}
+\hline 
+m & 1 & 2& 5&10\\
+\hline 
+\frac{10}{m} &10&5&2&1\\
+\hline 
+\mu\left(\frac{10}{m} \right) &{\color{red}1}&{\color{blue}-1}&{\color{blue}-1}&{\color{red}1}\\
+\hline
+\end{array}
+$$
+
+$$C_{10}(x) =\frac{(1-x^{{\color{red}10}})(1-x^{{\color{red}1}})}{(1-x^{{\color{blue}5}})(1-x^{{\color{blue}2}})} = \frac{(1+x^{5})}{(1+x)} =x^4-x^3+x^2-x+1$$
+
+
+
+$\hfill\square$ 
+
+~\\
+
+\textit{\textbf{定理3：}如果$a$是{\color{red}primitive root mod p} ,则 {\color{red}primitive root mod p}的集合是：}
+
+$${a^r :1 \leq  r \leq p-1, gcd(r,p-1) = 1}$$
+
+即如果知道其中一个primitive root，如何找到所有primitive root。
+
+\textbf{例3：}
+
+
+找到所有的primitive root mod 11，已知${\color{green}2}$是其中一个primitive root。
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline 
+k & {\color{red}1}&2 &{\color{red}3} &4 &5 &6 &{\color{red}7} &8 &{\color{red}9}&10 \\
+\hline 
+{\color{green}2}^k \pmod{11} &{\color{blue}2}&4&{\color{blue}8}&5&10&9&{\color{blue}7}&3&{\color{blue}6}&1\\
+\hline 
+\end{array}
+$$
+
+因为${\color{red}{1,3,7,9}}$和$p-1 = 11 -1 = 10 $互质，所以他们的primitive root就是他们的幂余$= {\color{blue}{2,8,7,6}}$
+
+$\hfill\square$
+
+\textbf{例4：}
+
+
+找到所有的primitive root mod 11后
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline 
+k & 1&2 &3&{\color{red}4} &5 &{\color{red}6} &7 &8 &9&10 \\
+\hline 
+2^k \pmod{11} &2&4&8&{\color{blue}5}&10&{\color{blue}9}&7&3&6&1\\
+\hline 
+\end{array}
+$$
+
+找到$9x \equiv 5 \pmod{11}$的解
+
+因为2是其中一个primitive root,所以$x=2^y$
+
+\begin{eqnarray}   
+\label{eq}
+{\color{blue}9}x  &\equiv& {\color{blue}5} \pmod{11} \nonumber \\
+2^{{\color{red}6}} \cdot 2^y &\equiv& 2^{{\color{red}4}} \pmod{11}\nonumber \\
+2^{6+y} &\equiv& 2^4 \pmod{11}\nonumber \\
+2^{2+y} &\equiv& 1 \pmod{11}\nonumber \\
+\nonumber 
+\end{eqnarray}
+
+所以$2+y \equiv 0 \pmod{\mu(11)} = 0 \pmod{10} \Rightarrow y = 8$    
+
+$$x = 2^8 \pmod{11} = 3$$
+$\hfill\square$ 
+
+
+\textbf{例5：}
+
+
+找到所有的primitive root mod 11后
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline 
+k & 1&2 &3&4 &5 &6 &7 &8 &9&10 \\
+\hline 
+2^k \pmod{11} &2&4&8&5&10&9&7&3&6&1\\
+\hline 
+\end{array}
+$$
+
+找到$7^x \equiv 5 \pmod{11}$的解
+
+因为7是其中一个primitive root,所以$x=7^y$
+
+\begin{eqnarray}   
+\label{eq}
+7^x  &\equiv&5 \pmod{11} \nonumber \\
+2^{7^x}  &\equiv&2^4 \pmod{11} \nonumber \\
+2^{7x}  &\equiv&2^4 \pmod{11} \nonumber \\
+2^{7x-4}  &\equiv&1 \pmod{11} \nonumber \\
+\nonumber 
+\end{eqnarray}
+
+所以$7x-4 \equiv 0 \pmod{\mu(11)} \Rightarrow 7x\equiv 4 \pmod{10} \Rightarrow x = 7^{-1}\cdot 4 = 3 \cdot 4 = 12 = 2 \pmod{10}$    
+$$x = 2$$
+
+注意$ 7^{-1}$不是幂倒数而是余倒数。
+
+$\hfill\square$ 
+
+\textit{\textbf{定义3：} 如果一个素数$p$和一个primitive root $\alpha$ mod $p$，给定一个整数$\beta$，求$x$的方法是}:
+
+
+$$\alpha^x  \equiv \beta \pmod{ p }$$
+
+$$x  \equiv log_{\alpha}(\beta) \pmod{ p }$$
+
+所以给定一个素数$p$，找到一个primitive root是相当容易的。对于小的$p$，我们可以通过穷举搜索来计算。但一般来说计算离散对数是困难的(没有已知的多项式时间算法)。
+
+\section{ElGamal 密码}
+
+加密步骤如下：
+
+\begin{enumerate}
+\item ${\color{blue}Alice}$ 和 ${\color{red}Bob}$ 共同决定一个质数$p$和一个primitive root $r$ mod $p$
+\item  ${\color{blue}Alice}$从$\{1,2,\cdots,p-1\}$中选择$a$，并计算公钥$\alpha = r^{a} \pmod{p}$
+\item  ${\color{red}Bob}$从$\{1,2,\cdots,p-1\}$中选择$b$，并计算公钥$\beta = r^{b} \pmod{p}$
+\item 假设 ${\color{red}Bob}$想发送一段信息$X$给${\color{blue}Alice}$。则从$\{2,\cdots,p-2\}$选择一个会话密钥$k$
+\item ${\color{red}Bob}$计算$U = r^k \pmod{p}$和$V = \alpha^kX = r^{ak}X \pmod{p}$，然后将$(U,V)$发送给${\color{blue}Alice}$
+\item  ${\color{blue}Alice}$解密密文，计算$U^{-a}V = r^{-ka}\alpha^kX =  r^{-ka}r^{ak}X = X$
+\end{enumerate}
+
+~\\
+
+\textbf{例6}：
+
+\begin{enumerate}
+\item 假设${\color{blue}Alice}$ 和 ${\color{red}Bob}$ 共同决定一个质数$p=11881379,r = 23$
+\item  ${\color{blue}Alice}$选择$a = 55$计算公钥$\alpha = r^{a} \pmod{p}= 23^{55} \pmod{p} = 1308503 \pmod{11881379}$
+\item  要加密信息$X = \textbf{LUNCH}$,则需要把\textbf{LUNCH}转化为数字。从0开始，按照字母表顺序，$L = 11,U = 20, N = 13, C = 2, H = 7$,$$X = 11 \cdot 26^4 + 20 \cdot 26^3 +13 \cdot 26^2 +2 \cdot 26^1 +7 \cdot 26^0 = 5387103  $$
+\item  ${\color{red}Bob}$选择会话密钥$k=123$，然后计算
+$$U = r^k \pmod{p} = 23^{123} \pmod{11881379} = 1777907 \pmod{11881379} $$
+和
+$$V = \alpha^kX = r^{ak}X \pmod{p} = 1308503^{123} \cdot 5387103 = 4944577 \pmod{11881379}$$
+发送$(U,V) = (1777907,4944577)$给${\color{blue}Alice}$
+\item 还原密文，${\color{blue}Alice}$计算
+$$U^{-a} = U^{-55} =U^{p -1 -55} = 1777907^{11881323} = 7112147 \pmod{11881379}$$
+$$X = U^{-a}V =7112147 \cdot 4944577 = 5387103 \pmod{11881379}$$
+\item $X=5387103 = \textbf{LUNCH}$ 
+\end{enumerate}
+
+\begin{lstlisting}
+#Python 求 幂次模余
+pow(1777907, 11881323, 11881379)#a^n%p, pow(a,n,p)
+\end{lstlisting} $\hfill\square$ 
+
+~\\
+
+如果攻击方想截取信息，那么能做什么?
+
+假设 ${\color{red}Eve}$截获了${\color{red}Bob}$发送的$(U,V)$，为了破译消息，${\color{red}Eve}$需要知道${\color{blue}Alice}$选择的整数$a$。Eve有两个选择:
+\begin{itemize}
+\item 解开未知数为$a$的方程$\alpha = r^{a} \pmod{p}$
+\item 解开未知数为$k$的方程$U = r^k \pmod{p}$
+\end{itemize}
+
+如果可以解开方程，则可以计算$\alpha^{-k}V =  \alpha^{-k}\alpha^{k}X = X$即破译成功。
+
+但因为离散对数的问题很难破解，所以很难解开方程组。
+
+不过${\color{red}Eve}$不能找出${\color{red}Bob}$发送给${\color{blue}Alice}$的是什么，以混淆她发送给${\color{blue}Alice}$的问题。这也是ElGamal密码其中一个问题。
+
+~\\
+
+\textbf{例7}：
+
+继续例6的问题。
+
+${\color{red}Eve}$拦截了信息$(U,V)$,然后自己发送了一个自己创造的$(U,V) = (5387871,7127763)$发送${\color{blue}Alice}$
+
+$$U^{-a} = U^{-55} =U^{p -1 -55} = 5387871^{11881323} = 3552158 \pmod{11881379}$$
+$$X = U^{-a}V =3552158 \cdot 7127763 = 6866650 \pmod{11881379}$$
+
+$$
+\begin{array}{l}
+6866650=15 \cdot 26^{4}+12010 \\
+=15 \cdot 26^{4}+17 \cdot 26^{2}+518 \\
+=15 \cdot 26^{4}+0 \cdot 26^{3}+17 \cdot 26^{2}+19 \cdot 26^{1}+24 \cdot 26^{0} \\
+= PARTY
+\end{array}
+$$
+
+
+$\hfill\square$ 
+
+
+
+~\\
+
+\section{安全性问题}
+
+公钥密码系统(如RSA、El Gamal)的一个主要缺点是，与现代密码(DES、AES)相比，它们的速度相对较慢。如果你想加密一些数据，使用公钥密码系统建立密匙。或者使用具有已建立的密钥的快速密码加密实际数据。
+
+那么El Gamal密码的安全性如何保证呢？与RSA类似，也是通过对一个数难以分解得出的。在离散对数问题中，也和质数一样难以分解一个大整数$N$。
+
+~\\
+
+\textbf{例8}：
+
+让$p=941, \alpha = 627 ,x = 347, y = 781$
+
+$$A = \alpha^{x} \pmod{p} =  627^{347} \pmod{941} = 390 \pmod{941} $$
+
+$$B = \alpha^{y} \pmod{p} =  627^{781} \pmod{941} = 691 \pmod{941} $$
+
+$$K = \alpha^{xy} \pmod{p} =  627^{347 \cdot 781} \pmod{941} = 470 \pmod{941} $$
+
+虽然${\color{red}Eve}$拦截了$A,B$,但想要求出$x,y$进而求出$K$是非常困难的。或者知道$K$也很难求出$A,B$。
+
+\end{document}
+
+%https://cryptobook.nakov.com/asymmetric-key-ciphers/elliptic-curve-cryptography-ecc#ecc-and-curve-security-strength
+
+%https://pdf.sciencedirectassets.com/280203/1-s2.0-S1877050915X00123/1-s2.0-S1877050915013332/main.pdf?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEAIaCXVzLWVhc3QtMSJHMEUCIEBjmjSvaeGcFXqUMzmfqtJU%2BedVhvt4dhbS38aFF%2BiEAiEA2POq3L0Fha2b1dUkrI%2FBySSytxOjBJEFRtgOACdf1VYqvQMI6v%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARADGgwwNTkwMDM1NDY4NjUiDBEElwiqFFBRNH3oZyqRA93kUABIqqrtmAj4yOuZZXA5rFW8l2V05SedVLZuo7RJL%2FMUEWnryLPs4V2OK3nVifaC5BTC2opn1NSzuC8ASOfeJy%2FHy5inSpexjOqxgWC1jq%2F58bmm1RmwtVNSyoygAIkI4xRfVHX1%2FFoxCM2m8XHTIMRUSX5beemmAq6rUVk%2Fimb3Pk9a6bYSR6%2F27fOv8e0TL0vwwyxLTITi1Fa5Sxy7vXlv6VAtd404vsbK%2BDbm5CDU1uxiJOfkfjw1YDCUMVPj%2Fl86T6hP21Ygy3XNreGpD64iLuGKIa1K6XR%2BDd3R%2BZ2pFjbGrmvZnzU0ZTbffWxHjLINeyQzifoAb5Z9h5ppY8O6fR77JtNFzTJfN5jz5Oipe4uqJC92GqYGGJVR7PK6khRNRMQo0SV5RVK5iPicC%2FLQGL3CkppezWj4GSknAg95LwfewNhsHjCl%2B5X%2BMBr0ROae2xzEupbj18mUjtrwfYeLbQMOyfwaC2oX5%2BviOPwPhxmC686JuKUbEj8xOhWrW8I%2B7Q9C%2BxlWYSkobpc0MJbS6YAGOusB7OSeE1pj5VS%2B48z9l%2FgJaokVH3p7%2B8j5CJeG3Aaq%2BA7%2BCmaxO2gZpOfcP3Z47jKNbWhGC2Cps85qC1WitSlOxY1j8jrkiAFDYtOCXKptQEf5POH71%2FL02Ww4A4JMRIl4Jg2VcidyzoxtnRZ7SSJj4nTbwVymIeZzQ2nX20eIapn%2FVThzkvDMNz6METRNZIoCsH%2BEWMSK0BZCgXmspS7zHayvPbwrgXEgXipjOH65tG%2Bz71P9BYSjBKAVZdFxatVMJqULZNuok4vlIT6rk1kHhjOtWKQTvAxpYZ61R6gYVIkvU09SspcXKDeXTw%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20210203T100558Z&X-Amz-SignedHeaders=host&X-Amz-Expires=299&X-Amz-Credential=ASIAQ3PHCVTYQOXHTCGI%2F20210203%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=75f37ec4bc4b9ab869449906937a896d6c16ca9d94046b651b42871835f1b291&hash=06cb8cfd1a16edd4ad4099097be66944f31631e2291c55ef1e7081e5bf25157b&host=68042c943591013ac2b2430a89b270f6af2c76d8dfd086a07176afe7c76c2c61&pii=S1877050915013332&tid=spdf-ec39d215-c136-4506-8d7f-1418fbac500d&sid=83bbb2c153283148a0889578b39a8e7b7d52gxrqa&type=client
+
+%https://zhuanlan.zhihu.com/p/42629724

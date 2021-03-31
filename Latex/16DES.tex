@@ -1,0 +1,107 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+\usepackage{amsthm}
+\usepackage{tikz}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{\indent 定理}[section]
+\newtheorem{lemma}[theorem]{\indent 引理}
+\newtheorem{proposition}[theorem]{\indent 命题}
+\newtheorem{corollary}[theorem]{\indent 推论}
+\newtheorem{definition}{\indent 定义}
+\newtheorem{example}{\indent 例}
+\newtheorem{remark}{\indent 注}
+\newenvironment{solution}{\begin{proof}[\indent\bf 解]}{\end{proof}}
+\renewcommand{\proofname}{\indent\bf 证明}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{pgfplots}
+\usetikzlibrary{calc}
+\pgfplotsset{compat=1.12}
+    
+\pgfplotsset{
+    compat=1.12,
+}
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{资料加密标准}
+
+
+\author{
+Data Encryption Standard(DES)\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+
+\begin{document}
+\maketitle
+
+\section{DES}
+数据加密标准(Data Encryption Standard)是一种对称密钥加密块密码算法。DES是由美国国家标准局所发布，曾经广泛应用于电子商务。DES现在已经不是一种安全的加密方法，主要因为它使用的56位密钥过短。
+
+\section{DES}
+
+DES与RSA、NTRU有些不同，下列表格所列举其中几个不同点。
+
+\begin{center}
+\begin{tabular}{ |c|c|c|c|} 
+\hline
+密码系统 &RSA& NTRU &DES \\ 
+\hline
+密钥结构&非对称&非对称&对称\\ 
+\hline
+密钥分布 & 简单 & ${\color{green}\mbox{简单}}$ &${\color{red}\mbox{困难}}$\\ 
+\hline
+加密&${\color{red}\mbox{慢}}$&${\color{green}\mbox{最快}}$&快 \\ 
+\hline
+解密& ${\color{red}\mbox{慢}}$&快&${\color{green}\mbox{最快}}$ \\ 
+\hline
+安全性&${\color{green}\mbox{最高}}$&高&${\color{red}\mbox{中等}}$ \\ 
+\hline
+\end{tabular}
+\end{center}
+
+\end{document}

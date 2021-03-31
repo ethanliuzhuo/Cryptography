@@ -1,0 +1,508 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{amssymb}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+\usepackage{soul}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes.geometric}
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{素数测试}
+
+
+\author{
+Prime Testing\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+\begin{document}
+\maketitle
+
+\section{素数}
+
+
+为了创建一个RSA密钥对,鲍勃需要选择两个大素数$p$和$q$。更准确地说,他需要一种区分质数和合数,因为如果他知道如何做到这一点,那么他可以选择大随机数,直到他达到一个质数。
+
+
+\subsection{欧拉定理}
+
+欧拉定理 (Euler's theorem)是数论中是一个关于同余的性质。是费马小定理的推广。
+
+\textit{\textbf{定义1：} 给定一个整数$n$和整数$a$, 如果满足}
+$$a^n \not\equiv a \pmod{n}$$
+
+\textit{那么我们$a$是$n$的一个\textbf{见证$Witness$}。}
+
+而有一个Witness就说明$n$是一个合数。
+
+但这个算法有一定问题：
+$561 = 3 \cdot 11 \cdot 17 $是一个合数，然而$561$没有Witness因为$a^{561} \equiv a \pmod{561}$。
+
+因此我们称没有Witness的合数被称为卡迈克尔数，也称伪素数。并且1984年由Alford、Granville和Pomerance证明伪素数有无限多个。
+
+
+\subsection{二次剩余}
+二次剩余(Quadratic Residue)是指$a$的平方$a^2$除以$p$得到的余数。
+
+\textit{\textbf{定义2：} 给定一个整数$a$是二次剩余的话，那么它必须满足}
+
+$$x^2 - a \equiv 0 \pmod{p}$$
+\textit{是有解的。}
+
+
+\textbf{例1：}
+
+\begin{eqnarray}   
+\label{eq}
+\bmod 5&:&  \begin{array}{c|cccc}
+x & 1 & 2 & 3 & 4 \\
+\hline x^{2} & 1 & 4 & 4 & 1\\
+\end{array} \nonumber \\ 
+\bmod 7&:&  \begin{array}{c|cccccc}
+x & 1 & 2 & 3 & 4 & 5 & 6 \\
+\hline x^{2} & 1 & 4 & 2 & 2 & 4 & 1\\
+\end{array} \nonumber \\ 
+\bmod 11&:&  \begin{array}{c|cccccccccc}
+x & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+\hline x^{2} & 1 & 4 & 9 & 5 & 3 & 3 & 5 & 9 & 4 & 1\\
+\end{array}\nonumber \\ 
+\nonumber 
+\end{eqnarray}
+
+
+$\hfill\square$ 
+
+\textit{定理1：一个数的二次剩余正好是$p-1$的一半。即有$(p-1)/2$个。}
+
+~\\
+
+
+\href{https://www.maths.tcd.ie/pub/Maths/Courseware/NumberTheory/QuadraticResidues.pdf}{\color{blue}{证明57页}}
+~\\
+
+
+\textit{定理2：对于任何一个大于2的素数$p$，并且 $a \not\equiv 0 \pmod{p}$,则：}
+
+$$
+a^{\frac{p-1}{2}}(\bmod p)=\left\{\begin{array}{ll}
+1 & \text { if } a \in Q R[p] \\
+-1 & \text { if } a \notin Q R[p]
+\end{array}\right.
+$$
+
+证明略。
+
+~\\
+
+\textit{定义3：勒让德符号(Legendre symbol)：}
+
+$$
+\left(\frac{a}{p}\right)=\left\{\begin{array}{ll}
+1 & \text { if } a \in Q R[p] \\
+-1 & \text { if } a \notin Q R[p] \\
+0 & \text { if } p \mid a
+\end{array}\right.
+$$
+\textit{其中$p$是奇素数，$a$是整数。}
+
+因为从定理2可知，
+
+$$
+\left(\frac{a}{p}\right) \equiv a^{(p-1) / 2}\pmod{p} \mbox{和} \left(\frac{a}{p}\right)=\left(\frac{a \pmod{p} }{p}\right)
+$$
+
+所以
+
+$$\left( \frac{ab}{p} \right) = \left( \frac{a}{p} \right)\left( \frac{b}{p} \right)$$
+
+
+
+\textit{定理3：二次互反律(Law of Quadratic Reciprocity), 如果$p，q$都是奇素数，那么：}
+
+$$
+\left(\frac{p}{q}\right)=(-1)^{\frac{(p-1)(q-1)}{4}}\left(\frac{q}{p}\right)
+$$
+
+\textbf{例2：}
+
+$$
+\left(\frac{5}{71}\right)=(-1)^{\frac{(5-1)(71-1)}{4}} \cdot \left(\frac{71}{5}\right)=\left(\frac{71}{5}\right)=\left(\frac{71 \pmod{5}}{5}\right)=\left(\frac{1}{5}\right) = 1
+$$
+
+$$
+\left(\frac{3}{79}\right)=(-1)^{\frac{(3-1)(79-1)}{4}} \cdot \left(\frac{79}{3}\right)=-\left(\frac{79}{3}\right)=-\left(\frac{79 \pmod{3}}{3}\right)=-\left(\frac{1}{3}\right) = -1
+$$
+
+$\hfill\square$ 
+
+
+
+因此如果$p，q$都是奇素数，那么$\frac{(p-1)(q-1)}{4}$是偶数，于是就可以知道
+
+$$x^2 \equiv p \pmod{q} \mbox{有一个解} \Leftrightarrow	x^2 \equiv q \pmod{p} \mbox{有一个解}$$
+
+
+\textit{定义4：雅可比符号 (Jacobi Symbol))：}
+
+
+$$J(a,n) = \left(\frac{a}{p_1}\right)\left(\frac{a}{p_2}\right) \cdots \left(\frac{a}{p_k}\right)$$
+
+其中$n = p_1p_2 \cdots p_k$。它是勒让德符号的延伸,不过当$n$很大且其质因数未知时，根据这个定义计算并不容易。但是我们仍然可以通过下面的递归来计算:
+
+
+$$
+J(a, n)=\left\{\begin{array}{ll}
+0 & \text { if } \ \operatorname{gcd}(a, n) \neq 1 \\
+1 & \text { if } \ a=1 \\
+(-1)^{\frac{n^{2}-1}{8}} J\left(\frac{a}{2}, n\right) & \text { if } \ a \text { \ is \ even } \\
+(-1)^{\frac{(a-1)(n-1)}{4}} J(n\pmod{a}, a) & \text { if } \ a \text { \ is \ odd \ and } \ a>1
+\end{array}\right.
+$$
+
+\textbf{例3：}
+
+计算$J(24,601)$
+
+\begin{eqnarray}   
+\label{eq}
+J(24,601) &=& ((-1)^{(60-1)(601+1)/8)} \cdot J({\color{blue}12},601) \nonumber \\
+&=&  J({\color{blue}12},601) \nonumber \\
+&=& (-1)^{((60-1)(601+1)/8)} \cdot J({\color{blue}6},601) \nonumber \\ 
+&=&  J({\color{blue}6},601) \nonumber \\
+&=& J({\color{red}3},601) \nonumber \\
+&=& ((-1)^{(3-1)(601-1)/4)} \cdot  J({\color{red}601},3) \nonumber \\
+&=& J({\color{red}601},3) \nonumber \\
+&=& J({\color{red}601} \pmod{3}, 3) \nonumber \\
+&=& J(1, 3) \nonumber \\
+&=& 1 \nonumber \\
+\nonumber 
+\end{eqnarray}
+
+注意{\color{red}红色}是奇数，{\color{blue}蓝色}是偶数。
+
+\begin{lstlisting}
+#雅可比符号 Jacobi Symbol 计算
+def jacobi(a, n):
+    assert(n > a > 0 and n%2 == 1)
+    t = 1
+    while a != 0:
+        while a % 2 == 0:
+            a /= 2
+            r = n % 8
+            if r == 3 or r == 5:
+                t = -t
+        a, n = n, a
+        if a % 4 == n % 4 == 3:
+            t = -t
+        a %= n
+    if n == 1:
+        return t
+    else:
+        return 0
+    
+j = jacobi(24, 601)
+
+print(j)
+\end{lstlisting}
+$\hfill\square$ 
+
+\section{Solovay–Strassen 素数判定法则}
+
+Solovay–Strassen 素数判定法(Solovay–Strassen Primality Test)是一种随机算法，步骤如下:
+\begin{enumerate}
+\item 随机在区间$[1,2,\cdots,n-1]$内选择$k$个$a$，即$a_1,a_2,\cdots,a_k \in {1,2,\cdots,n-1}$;
+\item 对于每一个$ai$，都需要确定以下两个等式：
+\begin{itemize}
+\item $J(a,n) = a^{(n-1)/2} \pmod{n}$
+\item $gcd(a,n) = 1$
+\end{itemize}
+\item 以上两个等式如果有一个不成立，那么$n$不是素数;
+\item 如果以上两个等式对于所有的$a_i$都满足，那么$n$可能为素数;
+\end{enumerate}
+
+
+
+\textbf{例4：}
+
+
+使用Solovay–Strassen 素数判定法则检测$n = 8911$是否为素数：
+
+随机取5个数：$a_1= 10, a_2=20,a_3=30,a_4=40,a_5 = 50$
+
+$$
+\begin{array}{|c||c|c|c|c|}
+\hline i & a_{i} & \operatorname{gcd}\left(a_{i}, n\right) & J\left(a_{i}, n\right) & a^{(n-1) / 2} \pmod{n} \\
+\hline 1 & 10& 1& 1& 0 \\
+\hline 2 & 20& 1& 1& 0  \\
+\hline 3 & 30& 1& -1& 0\\
+\hline 4 & 40& 1& 1& 0 \\
+\hline 5 & 50& 1& 1& 0 \\
+\hline
+\end{array}
+$$
+
+因为$J(a,n) \ne a^{(n-1)/2} \pmod{n}$
+
+因此$n = 8911$不是素数
+
+其时间复杂度为$O(k \cdot log^3(n))$, $k$为测试数量。
+
+算法有可能返回错误的答案。如果输入$n$确实是素数，那么输出判断就一定正确。然而，如果输入$n$是合数，那么输出可能是不正确的素数。$n$被称为 Solovay-Strassen伪素数。
+
+$\hfill\square$ 
+
+
+\section{使用二次因式攻击RSA}
+二次因式(Quadratic Factoring), 对于一个因子$n$,攻击者{\color{red}Eve}想到找两个数$x$,$y$，并且$(n-1)/2 \ge x > y$，满足下列式子：
+$$x^2 - y^2 \equiv 0 \pmod{n}$$
+
+如果$x+y$和$x-y$都不能被$n$整除，则$gcd(x+y,n)$和$gcd(x-y,n)$都是$n$的非凡因子( nontrivial factors of n),即：
+
+
+$$0 < x − y ≤ x < n − 1 , 0 < x + y ≤ n − 1$$
+
+攻击方式如下：
+\begin{enumerate}
+\item 随机在区间$[0,\cdots,(n-1)/2]$内选择$k$个$x$，即$x_1,x_2,\cdots,x_k \in[0,\cdots,(n-1)/2]$;
+\item 计算所有$x_i \pmod{n}$
+\item 如果$i \ne j$，但满足$x_i^2 \equiv x_j^2 \pmod{n}$
+\item 则$gcd(x_i+x_j,n) = p$和$gcd(x_i-x_j,n) = q$都是$n$的非凡因子
+\item $p,q$知道以后，就容易求出$N = p \cdot q$，RSA即遭到破解
+\end{enumerate}
+
+\section{离散对数问题}
+有一个素数$p$和一个整数$\alpha$,$\alpha$不能被$p$整除。那么如果给一个整数$\beta$，则：
+
+$$\alpha^x \equiv \beta \pmod{p}$$。
+
+即代表$x$有多组解。因为$3^x = 11 \Leftrightarrow	 x = log_3(11)$,但$3^x = 11 \pmod{18}$就代表有很多解。
+
+\textit{\textbf{定义5：}如果对于所有的$i$满足$a^i \equiv 1\pmod{p}$，那么将$a$称之为{\color{red}primitive root mod}}
+~\\
+\textit{\textbf{定理4：}如果$a$是{\color{red}primitive root mod p}}，则$a^1,a^2,\cdots ,a^{p-1} \pmod{p}$
+~\\
+
+\textbf{莫比斯公式：}
+$$
+\begin{aligned}
+&\mu(d)=\left\{\begin{array}{ll}
+(-1)^{k} \mbox{如果d是k个不同质数的乘积} \\
+0 & \mbox{其他} 
+\end{array}\right.\\
+\end{aligned}
+$$
+
+\textit{\textbf{定义6：}分圆多项式 (Cyclotomic polynomial)}:
+$$
+C_{n}(x)=\prod_{m \mid n}\left(1-x^{m}\right)^{\mu\left(\frac{n}{m}\right)}
+$$
+~\\
+
+
+
+\textit{\textbf{定理5：}对于每一个素数$p$，$a$是{\color{red}primitive root mod p} 当且仅当$C_{p-1}(a) \equiv 0 \pmod{p}$ }
+
+\textbf{例5：}
+
+$p = 11$
+
+$$C_{p-1}(2) = C_{10}(2) = 2^4- 2^3 +2^2-2^1+2^0 \pmod{11} \equiv 11 \pmod{11} \equiv 0 \pmod{11}$$
+
+$$C_{p-1}(3) = C_{10}(3) = 3^4- 3^3 +3^2-3^1+3^0 \pmod{11} \equiv 61 \pmod{11} \not\equiv 0 \pmod{11}$$
+
+
+因此2是一个{\color{red}primitive root mod 11}，3不是一个{\color{red}primitive root mod 11}。
+
+$\hfill\square$ 
+
+
+\textbf{例6：}
+
+
+$C_{18}(x), n = 18$
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|}
+\hline 
+m & 1 & 2& 3 &6&9&18 \\
+\hline 
+\frac{18}{m} &18&9&6&3&2&1  \\
+\hline 
+\mu\left(\frac{18}{m} \right) &0&0&{\color{red}1}&{\color{blue}-1}&{\color{blue}-1}&{\color{red}1} \\
+\hline
+\end{array}
+$$
+
+$$C_{18}(x) =\frac{(1-x^{{\color{red}18}})(1-x^{{\color{red}3}})}{(1-x^{{\color{blue}9}})(1-x^{{\color{blue}6}})} = \frac{(1+x^{9})}{(1+x^3)} =\frac{(1+x^{3})(1-x^{3}+x^{6})}{(1+x^3)}  = 1 - x^3+x^6$$
+
+~\\
+
+$C_{10}(x), n = 10$
+
+$$
+\begin{array}{|c|c|c|c|c|}
+\hline 
+m & 1 & 2& 5&10\\
+\hline 
+\frac{10}{m} &10&5&2&1\\
+\hline 
+\mu\left(\frac{10}{m} \right) &{\color{red}1}&{\color{blue}-1}&{\color{blue}-1}&{\color{red}1}\\
+\hline
+\end{array}
+$$
+
+$$C_{10}(x) =\frac{(1-x^{{\color{red}10}})(1-x^{{\color{red}1}})}{(1-x^{{\color{blue}5}})(1-x^{{\color{blue}2}})} = \frac{(1+x^{5})}{(1+x)} =x^4-x^3+x^2-x+1$$
+
+
+
+$\hfill\square$ 
+
+~\\
+
+\textit{\textbf{定理6：}如果$a$是{\color{red}primitive root mod p} ,则 {\color{red}primitive root mod p}的集合是：}
+
+$${a^r :1 \leq  r \leq p-1, gcd(r,p-1) = 1}$$
+
+即如果知道其中一个primitive root，如何找到所有primitive root。
+
+\textbf{例7：}
+
+
+找到所有的primitive root mod 11，已知${\color{green}2}$是其中一个primitive root。
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline 
+k & {\color{red}1}&2 &{\color{red}3} &4 &5 &6 &{\color{red}7} &8 &{\color{red}9}&10 \\
+\hline 
+{\color{green}2}^k \pmod{11} &{\color{blue}2}&4&{\color{blue}8}&5&10&9&{\color{blue}7}&3&{\color{blue}6}&1\\
+\hline 
+\end{array}
+$$
+
+因为${\color{red}{1,3,7,9}}$和$p-1 = 11 -1 = 10 $互质，所以他们的primitive root就是他们的幂余$= {\color{blue}{2,8,7,6}}$
+
+$\hfill\square$
+
+\textbf{例8：}
+
+
+找到所有的primitive root mod 11后
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline 
+k & 1&2 &3&{\color{red}4} &5 &{\color{red}6} &7 &8 &9&10 \\
+\hline 
+2^k \pmod{11} &2&4&8&{\color{blue}5}&10&{\color{blue}9}&7&3&6&1\\
+\hline 
+\end{array}
+$$
+
+找到$9x \equiv 5 \pmod{11}$的解
+
+因为2是其中一个primitive root,所以$x=2^y$
+
+\begin{eqnarray}   
+\label{eq}
+{\color{blue}9}x  &\equiv& {\color{blue}5} \pmod{11} \nonumber \\
+2^{{\color{red}6}} \cdot 2^y &\equiv& 2^{{\color{red}4}} \pmod{11}\nonumber \\
+2^{6+y} &\equiv& 2^4 \pmod{11}\nonumber \\
+2^{2+y} &\equiv& 1 \pmod{11}\nonumber \\
+\nonumber 
+\end{eqnarray}
+
+所以$2+y \equiv 0 \pmod{\mu(11)} = 0 \pmod{10} \Rightarrow y = 8$    
+
+$$x = 2^8 \pmod{11} = 3$$
+$\hfill\square$ 
+
+
+\textbf{例9：}
+
+
+找到所有的primitive root mod 11后
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline 
+k & 1&2 &3&4 &5 &6 &7 &8 &9&10 \\
+\hline 
+2^k \pmod{11} &2&4&8&5&10&9&7&3&6&1\\
+\hline 
+\end{array}
+$$
+
+找到$7^x \equiv 5 \pmod{11}$的解
+
+因为7是其中一个primitive root,所以$x=7^y$
+
+\begin{eqnarray}   
+\label{eq}
+7^x  &\equiv&5 \pmod{11} \nonumber \\
+2^{7^x}  &\equiv&2^4 \pmod{11} \nonumber \\
+2^{7x}  &\equiv&2^4 \pmod{11} \nonumber \\
+2^{7x-4}  &\equiv&1 \pmod{11} \nonumber \\
+\nonumber 
+\end{eqnarray}
+
+所以$7x-4 \equiv 0 \pmod{\mu(11)} \Rightarrow 7x\equiv 4 \pmod{10} \Rightarrow x = 7^{-1}\cdot 4 = 3 \cdot 4 = 12 = 2 \pmod{10}$    
+$$x = 2$$
+
+注意$ 7^{-1}$不是幂倒数而是余倒数。
+
+$\hfill\square$ 
+
+\textit{\textbf{定义7：} 如果一个素数$p$和一个primitive root $\alpha$ mod $p$，给定一个整数$\beta$，求$x$的方法是}:
+
+
+$$\alpha^x  \equiv \beta \pmod{ p }$$
+
+$$x  \equiv log_{\alpha}(\beta) \pmod{ p }$$
+
+所以给定一个素数$p$，找到一个primitive root是相当容易的。对于小的$p$，我们可以通过穷举搜索来计算。但一般来说计算离散对数是困难的(没有已知的多项式时间算法)。
+\end{document}
+

@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\geometry{a4paper,scale=0.8}
+\date{}
+
+
+\title{密码学简介}
+
+
+\author{
+ 刘卓\\
+ \texttt{ } \\
+}
+
+\begin{document}
+\maketitle
+
+\section{介绍}
+密码学(Cryptography)是研究以加密的形式发送信息的方法，只有掌握此加密技术的特定人群才能破解加密获得有效信息。
+
+一些关键词：
+\begin{itemize}
+\item 明文(Plaintext)：加密前的信息。
+\item 密文(Ciphertext)：加密后的信息。
+\item 加密(Encryption): 通过特定的加密技术将明文转化为密文的行为。
+\item 解密（Decryption）：由掌握加密技术的特定人群将密文转化为明文的行为。
+\item 发件人（Sender）：$Alice$.
+\item 收件人(Receiver)： $Bob$.
+\item 攻击者\拦截者（Attacker）：$Eva$.
+\item n-gram:由n个字母组成的字符串。
+\item 密钥(Key): 密钥通常是一系列数字或符号，用于确定明文转换为密文的算法。只使用一次的键称为一次性键盘/键。
+\item 密钥空间(Key Space): 用$K$表示，密钥的所有可能。
+\item 明文(Plaintext ):用$M$表示，明文消息的集合。
+\item 密文空间（Ciphertext space）：用$C$表示，所有在特定的加密事务中可能出现的明文消息。
+\end{itemize}
+
+\clearpage
+
+\section{加密主要方法}
+\begin{itemize}
+\item \textbf{替换}（Substitution）：n个字母的明文替换成n个字母密文。
+\item \textbf{换位}（Transposition）:将原始信息的字符按照某些特定的模式重新排列。
+\end{itemize}
+
+现代的加密方式是以上两种的混合。
+
+\section{加密解密过程}
+
+明文，由\textit{Alice }通过密钥加密，变成密文。通过选定途径，发送给\textit{Bob}，\textit{Bob}通过密钥进行解密，得到明文。
+
+\section{密码学假设}
+\begin{itemize}
+\item 发送方和接收方之间没有安全的通信通道。
+\item 信息的安全性是因为攻击者不知道加密中使用了何种特定密钥，以及加密方式。如果攻击者一旦知道密钥及加密方法，密文则被破译。
+\item 攻击者有三种攻击方式
+\begin{enumerate}
+\item 纯密文攻击：攻击者只需要掌握密文来恢复明文。
+\item 明文攻击：攻击者通过掌握一些关于原始明文的信息来恢复明文。
+\item 选择性明文攻击：攻击者通过获得与其选择的明文对应的密文来部分破解密文。
+\end{enumerate}
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,101 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{amssymb}
+\usepackage{graphicx} %插入图片的宏包
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{listings}
+\usepackage{soul}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes.geometric}
+
+
+\geometry{a4paper,scale=0.8}
+\date{}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{迪菲-赫尔曼密钥交换}
+
+
+\author{
+Diffie-Hellman Key Exchange\\
+ 刘卓\\
+ \texttt{ } \\
+}
+
+
+\begin{document}
+\maketitle
+
+迪菲-赫尔曼密钥交换(Diffie-Hellman Key Exchange)可以让双方在完全没有对方任何预先信息的条件下通过不安全信道创建起一个密钥。这个密钥可以在后续的通讯中作为对称密钥来加密通讯内容。公钥交换的概念最早由瑞夫·墨克（Ralph C. Merkle）提出，而这个密钥交换方法，由惠特菲尔德·迪菲（Bailey Whitfield Diffie）和马丁·赫尔曼（Martin Edward Hellman）在1976年首次发表。
+
+换句话说，${\color{blue}Alice}$ 和 ${\color{red}Bob}$想要共享一个用于对称密码的密钥分享给对方，但是
+他们交流渠道是不安全的，很容易被拦截或者窃听。使用迪菲-赫尔曼密钥交换就可以在这种条件下把密钥交换给对方。
+
+\section{密钥交换步骤}
+\begin{enumerate}
+\item ${\color{blue}Alice}$ 和 ${\color{red}Bob}$决定一个大质数$p$和一个非零的整数$r$ mod $p$。即$r$ 是一个primitive root mod $p$。${\color{blue}Alice}$ 和 ${\color{red}Bob}$公开$r$ 和 $p$，所有人都知道他们的值；
+\item ${\color{blue}Alice}$ 选择一个整数$x$使得$x \pmod{p}$； ${\color{red}Bob}$选择一个整数$y$使得$y \pmod{p}$；
+\item ${\color{blue}Alice}$ 计算$A \equiv r^x \pmod{p}$；${\color{red}Bob}$计算$B \equiv r^y  \pmod{p}$；
+\item ${\color{blue}Alice}$ 和 ${\color{red}Bob}$公开交换$A,B$
+\item ${\color{blue}Alice}$ 计算$B^x \pmod{p}$；${\color{red}Bob}$计算$A^y \pmod{p}$；
+\item ${\color{blue}Alice}$ 和 ${\color{red}Bob}$算出这两个值是于$k \equiv r^{xy} \pmod{p}$相等的，这也是他们的私钥。
+\end{enumerate}
+
+因为$\underbrace{B^x  = (r^y)^x  = r^{xy} = (r^x)^y  = A^y}_{\pmod{p}} $, 所以他们的密钥是一样的。
+
+值得注意的是：公开的信息是$p$,$r$, $A$,$B$;
+
+私密信息是$x,y,k$;
+
+如果${\color{red}Eve}$能够解决离散对数问题(即给定$A$和$B$找到x和y)，那么她就能够找到$k$。这并不简单，但确实如此，即在给定$A$、$B$、$r$和$p$的情况下找到$k$与解决DLP(Data loss prevention software)一样困难。
+
+~\\
+
+\textbf{例1}
+
+假设$p = 37$,$r=17$,${\color{blue}Alice}$ 选择整数9，${\color{red}Bob}$ 选择整数10
+
+$$A = r^x \pmod{p} = 17^9 \pmod{37} = 6 \pmod{37}  $$
+$$B = r^y \pmod{p} = 17^{10} \pmod{37} = 28 \pmod{37}  $$
+$$k = \underbrace{ B^x= 28^{9} =  36 = 6^{10} = A^y}_{\pmod{37} }$$
+
+还有验证签名的方法，具体方法是Zero Knowledge Protocol。
+\end{document}
+

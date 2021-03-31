@@ -91,18 +91,18 @@ p \cdot q &=&  31074182404900437213507500358885679300373460228427275457201619488
 \nonumber 
 \end{eqnarray}
 
-尝试因式分解。
+尝试因式分解，会发现很难分解出$p$和$q$。
 $\hfill\square$ 
 
 \section{数论}
 
-\textit{\textbf{定义2：} Euler $\varphi$ (n) 函数计算在封区间[1,n]内与n没有公因数的整数的个数。也就是说,
+\textit{\textbf{定义2：} Euler $\varphi$ (n) 函数计算在封区间[1,n]内与n没有公因数的整数的个数。也就是说,}
 $$
 \begin{aligned}
 &\varphi(n)=\#\{m \in \mathbb{Z}: 1 \leq m \leq n, \operatorname{gcd}(m, n)=1\}\\
 \end{aligned}
 $$
-}
+
 
 $$
 \begin{array}{c|ccccccccccccccc}
@@ -116,7 +116,7 @@ $$\varphi(mn) = \varphi(m)\varphi(n)$$
 
 \textbf{例2}
 
-$$\varphi55) = \varphi(5 \times 11) = \varphi(5)\varphi(11) = 4 \times 10$$
+$$\varphi(55) = \varphi(5 \times 11) = \varphi(5)\varphi(11) = 4 \times 10$$
 
 
 $\hfill\square$ 
@@ -255,7 +255,7 @@ RSA加密算法是一种非对称加密算法，在公开密钥加密和电子�
 \subsection{RSA使用步骤}
 
 \begin{enumerate}
-\item (密钥创建，私钥) ${\color{red}Bob}$ 选择两个只有自己执导的质数 p 和 q， 然后计算$N = p \cdot q$; 
+\item (密钥创建，私钥) ${\color{red}Bob}$ 选择两个只有自己知道的质数 p 和 q， 并且$p \ne q$, 然后计算$N = p \cdot q$; 
 \item ${\color{red}Bob}$ 选择一个正整数素数的加密指数(encryption exponent)e，计算$\varphi(N) = (p-1)(q-1)$;
 \item ${\color{red}Bob}$公开 N 和 e；
 \item (加密) ${\color{blue}Alice}$将明文m, 使用${\color{red}Bob}$公开的密钥加密。密文计算方法为$c \equiv m^e \quad (mod \quad N)$；
@@ -293,6 +293,8 @@ $$\varphi(N)  = (p-1)(q-1)=pq - p -q + = N -(p+q)+1$$
 $$N \ge 26^k - 1 \Rightarrow k = \log_26(N)$$
 
 k为整数，向下取整。这里的k就是一次性能发送多少位字符的数量。比如说$N =131 \cdot 1873 = 245363 \Rightarrow k = \log_26(245363) = 3$，也就是说使用质数$p=131,q=1873$时，一次可以加密3个字符的信息发送给对方。
+
+~\\
 
 \textbf{例6}
 
@@ -338,26 +340,32 @@ x &\equiv& y \quad (\bmod \quad \varphi(n)  \nonumber \\
 
 \textbf{例7}
 
-$$7^42 \quad (\bmod \quad 11)$$
+$$7^{42} \quad (\bmod \quad 11)$$
 
 $$42 \equiv 2  (\bmod \quad \varphi(11)) = 2  (\bmod \quad 10)$$
 
-$$7^42 \equiv 7^2  (\bmod \quad 11) = 49 (\bmod \quad 11) = 5$$
+$$7^{42} \equiv 7^2  (\bmod \quad 11) = 49 (\bmod \quad 11) = 5$$
 $\hfill\square$ 
 
 \subsection{计算大数的余}
+
+~\\
 
 \textbf{例8}
 
 如果计算$1915793^{2641} \quad (\bmod \quad 5678923)$这种大数的mod呢？我们不想处理大于$n^2$的数字。应用定理4.
 
+~\\
+
 第一步：
+
+~\\
 
 a = 1915793,k = 5678923,n = 5678923
 
 将k转化为二进制数,
 
-$$k = 5678923 = 1 + 2^4+2^6+2^9+2^11 = 1+16+64+512+2048$$
+$$k = 5678923 = 1 + 2^4+2^6+2^9+2^{11} = 1+16+64+512+2048$$
 
 \begin{lstlisting}
 #二进制数
@@ -380,7 +388,11 @@ for i in range(len(cov_number_bin)):
 print(sum_number)
 \end{lstlisting}
 
+~\\
+
 第二步：
+
+~\\
 
 用重复的平方来得到上面的幂的余：
 
@@ -395,16 +407,36 @@ a^{1024} \equiv 2627277 \quad (\bmod \quad n) & a^{2048} \equiv 1180227 \quad (\
 \end{array}
 $$
 
+~\\
+
 第三步：
 
+~\\
 
 \begin{eqnarray}   
 \label{eq}
-a^{k} &=& a \cdot a^{16} \cdot a^{64} \cdot a^{512} \cdot a^{2048}  \nonumber \\ 
+a^{k} &=& a \cdot a^{16} \cdot a^{64} \cdot a^{512} \cdot a^{2048}  \pmod{n} \nonumber \\ 
  &=& 1915793 \cdot 1424066 \cdot 3305529 \cdot 5106329 \cdot 1180227 \quad (\bmod \quad n) \nonumber \\ 
  &=&  1162684 \quad (\bmod \quad n) \nonumber \\ 
 \nonumber 
 \end{eqnarray}
+
+完成Python计算过程如下，速度比{\color{red}$a**n\%p$}快，因为无需重复计算。下面函数等同于内置函数 {\color{red}pow(a,n,p)}
+
+\begin{lstlisting}
+def fastExpMod(a, n, p):
+    result = 1
+    while n != 0:
+        if (n&1) == 1:
+            # ei = 1, then mul
+            result = (result * a) % p
+        n >>= 1
+        # a, a^2, a^4, a^8, ... , a^(2^n)
+        a = (a*a) % p
+    return result
+\end{lstlisting}
+
+
 
 $\hfill\square$ 
 
@@ -414,15 +446,17 @@ $\hfill\square$
 
 选择$p=53,q = 89$,已知加密因子和解密因子$e = 119,d = 424$
 
-首先检查满足$e \cdot d \equiv 1 \quad (\bmod \quad \varphi(4717))= 1 \quad (\bmod \quad (53-1)(89-1))  = 1 \quad (\bmod \quad 4576) $
+首先检查是否满足$e \cdot d \equiv 1 \quad (\bmod \quad \varphi(4717))= 1 \quad (\bmod \quad (53-1)(89-1))  = 1 \quad (\bmod \quad 4576) $
 
-1. 加密明文75
+~\\
+
+1. 加密明文{\color{red}75}
 
 第一步：
 $$N = p \times q = 53 \cdot 89 =4717$$
 
 第二步：
-$$c = m^e \quad (\bmod \quad N) = 75^{119} \quad (\bmod \quad 4717) = 3500$$
+$$c = m^e \quad (\bmod \quad N) = {\color{red}75}^{119} \quad (\bmod \quad 4717) = 3500$$
 
 第三步：
 $$119 = 2^0+2^1+2^2+2^4+2^5+2^6 = 1+2+4+16+32+64$$
@@ -440,12 +474,28 @@ $$
 
 $$75^{119} = 75\cdot908\cdot3706\cdot3249\cdot4072\cdot929\cdot4547 \quad (\bmod \quad 4717)  = 3530$$
 
-2. 解密密文2
+~\\
 
-$$m = c^d \quad (\bmod \quad N) = 2^{423} \quad (\bmod \quad 4717) = 3414$$
+2. 解密密文{\color{blue}2}
+
+$$m = c^d \quad (\bmod \quad N) = {\color{blue}2}^{423} \quad (\bmod \quad 4717) = 3414$$
 
 $\hfill\square$ 
 
+\section{应用RSA在ATM机}
+
+我们卡上的磁片可以通过自动柜员机(ATM)与银行联系，我们通过输入的4到8位的密码来操作我们的账户，那么银行是如何保护我们的账户安全的呢？
+\begin{enumerate}
+\item 银行选择两个大质数${\color{red}p}$和${\color{red}q}$,并计算${\color{green}N} = p \cdot q$；
+\item 银行对每张卡进行编程，对每张卡选择不同的加密因子${\color{blue}e}$加密RSA。即每张卡有不一样的加密因子；
+\item 顾客办理银行卡时，选择自己喜欢的密码，这个密码通常是4到8位(银行决定位数)的整数，可以不是素数；
+\item 银行在客户的文件中存储密码并生成相应的解密因子${\color{red}d}$；
+\item 当客户在自动柜员机(ATM)上插入卡并输入密码时，银行就会检索客户的文件，获取一个很大的随机数，这个随机数$X \in [1,{\color{green}N}-1]$，然后计算$X^{\color{red}d} \pmod{{\color{green}N}}$并发送到ATM进行验证；
+\item ATM计算$X = (X^{\color{red}d})^{{\color{blue}e}} \pmod{{\color{green}N}}$，并返回$(X+1)^{{\color{blue}e}} \pmod{{\color{green}N}}$给银行；
+\item 银行计算$((X+1)^{{\color{blue}e}})^{{\color{red}d}} \pmod{{\color{green}N}}$和$X+1$是否相等，如果相等，则输入密码正确；否则密码错误；
+\end{enumerate}
+
+因为攻击者很难从$X^d$ 和$(X+1)^e$找到加密因子$e$和解密因子$d$，因此可以保证账户安全。
 
 \end{document}
 
